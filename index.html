@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="hu" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Univerzális Fájlkonvertáló</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Alap konvertáló könyvtárak -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (window['pdfjs-dist/build/pdf']) {
+            window['pdfjs-dist/build/pdf'].GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
+    <!-- Különleges (PRO) formátum és MP3 könyvtárak -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-psd@15.0.0/dist/bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 dark:bg-[#0B1120] dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-300 antialiased selection:bg-teal-500 selection:text-white">
+
+    <!-- Fejléc -->
+    <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-20 transition-colors duration-300">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-teal-600 dark:bg-teal-500 flex items-center justify-center text-white shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 id="mainTitle" class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        Univerzális Fájlkonvertáló
+                    </h1>
+                    <p id="creatorText" class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        Készítette: Nagy Márton
+                    </p>
+                </div>
+            </div>
+
+            <!-- Nyelv és Téma vezérlők -->
+            <div class="flex items-center gap-3">
+                <div class="inline-flex rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-100 dark:bg-slate-800/90 p-1">
+                    <button id="langHu" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-400 shadow-sm">
+                        Magyar
+                    </button>
+                    <button id="langEn" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
+                        English
+                    </button>
+                </div>
+
+                <button id="themeToggle" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm" aria-label="Téma váltása">
+                    <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fő tartalom -->
+    <main class="max-w-4xl w-full mx-auto px-6 py-8 flex-grow flex flex-col justify-center">
+        
+        <!-- Bevezető rész -->
+        <div class="text-center max-w-2xl mx-auto mb-8">
+            <h2 id="heroTitle" class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                Alakítsd át és finomhangold fájljaidat egyszerűen
+            </h2>
+            <p id="heroSub" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Állíts be egyedi felbontást (akár 2K/4K-ig), bitrátát vagy képméretet mentés előtt. A rendszer automatikusan megjelöli a fájl eredeti értékeit.
+            </p>
+        </div>
+
+        <!-- Fő munkaterület kártya -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-6 sm:p-8 transition-all">
+            
+            <!-- Feltöltő zóna (Dropzone) -->
+            <div id="dropZone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-600 dark:hover:border-teal-500 rounded-2xl p-8 sm:p-12 text-center cursor-pointer transition-all bg-slate-50/70 dark:bg-slate-800/40 hover:bg-teal-50/30 dark:hover:bg-slate-800/80 group">
+                <input type="file" id="fileInput" class="hidden">
+                <div class="flex flex-col items-center pointer-events-none">
+                    <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4 shadow-sm group-hover:scale-105 transition-transform">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.75 3.75 0 0118 19.5H6.75z"></path>
+                        </svg>
+                    </div>
+                    <p id="dropTitle" class="text-base font-semibold text-slate-800 dark:text-slate-200">
+                        Kattints a fájl kiválasztásához, vagy húzd ide
+                    </p>
+                    <p id="dropSub" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                        Videók (MP4, MOV, WebM - 4K/2K), Hang (MP3, WAV), Képek (PSD, HEIC, TIFF, PNG, JPG), PDF, Word, Excel, 3D
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kiválasztott fájl és beállítások panel -->
+            <div id="panel" class="hidden mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                
+                <div class="flex items-center justify-between mb-4">
+                    <span id="fileInfoTitle" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
+                        Kiválasztott fájl
+                    </span>
+                    <button id="resetBtn" class="text-xs font-medium text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 flex items-center gap-1 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span id="resetBtnText">Másik fájl választása</span>
+                    </button>
+                </div>
+
+                <!-- Fájl adatkártya -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 text-sm">
+                    <div class="overflow-hidden">
+                        <span id="labelName" class="text-xs text-slate-500 dark:text-slate-400 block">Fájl neve</span>
+                        <span id="fileName" class="font-semibold text-slate-900 dark:text-white truncate block mt-0.5"></span>
+                    </div>
+                    <div>
+                        <span id="labelType" class="text-xs text-slate-500 dark:text-slate-400 block">Felismert típus</span>
+                        <span id="fileType" class="font-semibold text-teal-700 dark:text-teal-400 block mt-0.5"></span>
+                    </div>
+                    <div>
+                        <span id="labelSize" class="text-xs text-slate-500 dark:text-slate-400 block">Fájlméret</span>
+                        <span id="fileSize" class="font-semibold text-slate-900 dark:text-white block mt-0.5"></span>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 1. KÉP BEÁLLÍTÁSOK PANEL -->
+                <!-- ========================================== -->
+                <div id="imageSettingsPanel" class="hidden mt-5 bg-slate-50/70 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2.5">
+                        <span id="imgPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Képminőség és Felbontás Beállítások
+                        </span>
+                        <span id="origDimensionsBadge" class="text-xs font-semibold text-teal-700 dark:text-teal-400"></span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            <label id="qualityLabel" for="qualityRange">Képminőség és tömörítés</label>
+                            <span id="qualityValue" class="font-bold text-teal-700 dark:text-teal-400">100%</span>
+                        </div>
+                        <input type="range" id="qualityRange" min="10" max="100" value="100" step="5" class="w-full accent-teal-600 cursor-pointer">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
+                        <div>
+                            <label id="lblImgScale" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Gyors átméretezés</label>
+                            <select id="imgScaleSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <option value="100">100% (Eredeti)</option>
+                                <option value="75">75%</option>
+                                <option value="50">50%</option>
+                                <option value="25">25%</option>
+                                <option value="150">150% (Nagyítás)</option>
+                                <option value="200">200% (Dupla)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label id="lblImgWidth" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Szélesség (px)</label>
+                            <input type="number" id="imgWidthInput" min="1" max="12000" placeholder="Auto" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label id="lblImgHeight" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Magasság (px)</label>
+                            <input type="number" id="imgHeightInput" min="1" max="12000" placeholder="Auto" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label id="lblImgFilter" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Színprofil / Effekt</label>
+                            <select id="imgFilterSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <option value="none" id="optFilterNone">Eredeti színek</option>
+                                <option value="grayscale" id="optFilterGray">Fekete-fehér (Szürke)</option>
+                                <option value="sepia" id="optFilterSepia">Szépia (Nosztalgia)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="keepAspectCheckbox" checked class="rounded text-teal-600 focus:ring-teal-500 cursor-pointer">
+                        <label id="lblKeepAspect" for="keepAspectCheckbox" class="text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                            Oldalarány megtartása (ne torzuljon a kép)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 2. VIDEÓ BEÁLLÍTÁSOK PANEL (2K/4K + Eredeti értékek jelölése) -->
+                <!-- ========================================== -->
+                <div id="videoSettingsPanel" class="hidden mt-5 bg-slate-50/70 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-700/60 pb-2.5">
+                        <span id="vidPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Videó és Hangsáv Beállítások
+                        </span>
+                        <span id="origVideoMetaBadge" class="text-xs font-semibold text-teal-700 dark:text-teal-400"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div id="vidResBox">
+                            <label id="lblVidRes" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Videó Felbontás</label>
+                            <select id="vidResSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                        <div id="vidBitrateBox">
+                            <label id="lblVidBitrate" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Videó Bitráta (Minőség)</label>
+                            <select id="vidBitrateSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                        <div id="vidFpsBox">
+                            <label id="lblVidFps" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Képkockasebesség (FPS)</label>
+                            <select id="vidFpsSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                        <div id="vidAudioBitrateBox">
+                            <label id="lblVidAudioBitrate" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">MP3 / Hang Bitráta</label>
+                            <select id="vidAudioBitrateSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 3. HANGFÁJL BEÁLLÍTÁSOK PANEL (Eredeti értékek jelölésével) -->
+                <!-- ========================================== -->
+                <div id="audioSettingsPanel" class="hidden mt-5 bg-slate-50/70 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-700/60 pb-2.5">
+                        <span id="audPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Hangminőség és Bitráta Beállítások
+                        </span>
+                        <span id="origAudioMetaBadge" class="text-xs font-semibold text-teal-700 dark:text-teal-400"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div id="audBitrateBox">
+                            <label id="lblAudBitrate" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">MP3 Bitráta</label>
+                            <select id="audBitrateSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                        <div>
+                            <label id="lblAudSampleRate" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Mintavételezés (Sample Rate)</label>
+                            <select id="audSampleRateSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                        <div>
+                            <label id="lblAudChannels" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Hangcsatornák</label>
+                            <select id="audChannelsSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium">
+                                <!-- Dinamikusan épül fel az eredeti értékek jelölésével -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konverzió vezérlő -->
+                <div class="mt-6">
+                    <label id="targetLabel" for="targetFormat" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+                        Milyen formátumba szeretnéd átalakítani?
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <select id="targetFormat" class="flex-grow bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-600 transition-all">
+                        </select>
+                        <button id="convertBtn" class="bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2 shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span id="convertBtnText">Átalakítás indítása</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Folyamatjelző / Hibaüzenet -->
+                <div id="statusBox" class="hidden mt-5 p-4 rounded-xl text-xs font-medium text-center"></div>
+
+                <!-- Letöltés doboz -->
+                <div id="downloadArea" class="hidden mt-6 p-5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 text-center">
+                    <p id="successMsg" class="text-emerald-800 dark:text-emerald-300 text-sm font-semibold mb-3">
+                        Az új fájl elkészült, máris letöltheted!
+                    </p>
+                    <a id="downloadLink" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-8 py-3 rounded-xl transition-all shadow-sm" download="konvertalt_fajl">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span id="downloadBtnText">Fájl letöltése</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Támogatott formátumok áttekintő kártyák -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                <h3 id="card1Title" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1">PRO Kép & Felbontás</h3>
+                <p id="card1Desc" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Photoshop (.psd), HEIC, TIFF, PNG, JPG konvertálás egyedi pixel méretezéssel, szűrőkkel és 100% minőségben.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                <h3 id="card2Title" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1">4K / 2K Videó & MP3</h3>
+                <p id="card2Desc" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Videók átalakítása MOV, MP4, WebM formátumba akár 4K/2K felbontásban. Hangsáv kinyerése MP3/WAV-ba.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                <h3 id="card3Title" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1">HangStúdió & Bitráta</h3>
+                <p id="card3Desc" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">MP3 és WAV konvertálás az eredeti paraméterek kijelzésével, szabadon választható bitrátával (64-320 kbps).</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                <h3 id="card4Title" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1">Iroda, 3D & Adat</h3>
+                <p id="card4Desc" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D modellek (.stl -> .obj) és ZIP/CBZ archívumok feldolgozása.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Lábléc -->
+    <footer class="p-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 mt-8">
+        <span id="footerText">Adatvédelem: Minden fájlfeldolgozás közvetlenül a böngésződben történik, semmilyen adat nem kerül fel külső szerverre.</span>
+    </footer>
+
+    <!-- Alkalmazás Logika -->
+    <script>
+        // --- 1. NYELVI SZÓTÁR ---
+        const i18n = {
+            hu: {
+                pageTitle: "Univerzális Fájlkonvertáló",
+                mainTitle: "Univerzális Fájlkonvertáló",
+                creator: "Készítette: Nagy Márton",
+                heroTitle: "Alakítsd át és finomhangold fájljaidat egyszerűen",
+                heroSub: "Állíts be egyedi felbontást (akár 2K/4K-ig), bitrátát vagy képméretet mentés előtt. A rendszer automatikusan megjelöli a fájl eredeti értékeit.",
+                dropTitle: "Kattints a fájl kiválasztásához, vagy húzd ide",
+                dropSub: "Videók (MP4, MOV, WebM - 4K/2K), Hang (MP3, WAV), Képek (PSD, HEIC, TIFF, PNG, JPG), PDF, Word, Excel, 3D",
+                fileInfoTitle: "Kiválasztott fájl",
+                resetBtnText: "Másik fájl választása",
+                labelName: "Fájl neve",
+                labelType: "Felismert típus",
+                labelSize: "Fájlméret",
+                origTag: "Eredeti",
+                origKeep: "Eredeti megtartása",
+                
+                // Kép panel
+                imgPanelTitle: "Képminőség és Felbontás Beállítások",
+                qualityLabel: "Képminőség és tömörítés",
+                lblImgScale: "Gyors átméretezés",
+                lblImgWidth: "Szélesség (px)",
+                lblImgHeight: "Magasság (px)",
+                lblImgFilter: "Színprofil / Effekt",
+                optFilterNone: "Eredeti színek",
+                optFilterGray: "Fekete-fehér (Szürke)",
+                optFilterSepia: "Szépia (Nosztalgia)",
+                lblKeepAspect: "Oldalarány megtartása (ne torzuljon a kép)",
+
+                // Videó panel
+                vidPanelTitle: "Videó és Hangsáv Beállítások",
+                lblVidRes: "Videó Felbontás",
+                lblVidBitrate: "Videó Bitráta (Minőség)",
+                lblVidFps: "Képkockasebesség (FPS)",
+                lblVidAudioBitrate: "MP3 / Hang Bitráta",
+
+                // Hang panel
+                audPanelTitle: "Hangminőség és Bitráta Beállítások",
+                lblAudBitrate: "MP3 Bitráta",
+                lblAudSampleRate: "Mintavételezés (Sample Rate)",
+                lblAudChannels: "Hangcsatornák",
+                optAudStereo: "Sztereó (2 csatorna)",
+                optAudMono: "Monó (1 csatorna)",
+
+                targetLabel: "Milyen formátumba szeretnéd átalakítani?",
+                convertBtnText: "Átalakítás indítása",
+                converting: "A fájl feldolgozása folyamatban van, kérlek várj...",
+                convertingVideo: "Videó átkódolása folyamatban (a kiválasztott felbontással és bitrátával rögzítjük)...",
+                convertingMp3: "MP3 hangsáv tömörítése a kiválasztott bitrátával...",
+                successMsg: "Az új fájl elkészült, máris letöltheted!",
+                downloadBtnText: "Fájl letöltése",
+                footerText: "Adatvédelem: Minden fájlfeldolgozás közvetlenül a böngésződben történik, semmilyen adat nem kerül fel külső szerverre.",
+                errorGeneric: "Nem sikerült átalakítani a fájlt: ",
+                
+                card1Title: "PRO Kép & Felbontás",
+                card1Desc: "Photoshop (.psd), HEIC, TIFF, PNG, JPG konvertálás egyedi pixel méretezéssel, szűrőkkel és 100% minőségben.",
+                card2Title: "4K / 2K Videó & MP3",
+                card2Desc: "Videók átalakítása MOV, MP4, WebM formátumba akár 4K/2K felbontásban. Hangsáv kinyerése MP3/WAV-ba.",
+                card3Title: "HangStúdió & Bitráta",
+                card3Desc: "MP3 és WAV konvertálás az eredeti paraméterek kijelzésével, szabadon választható bitrátával (64-320 kbps).",
+                card4Title: "Iroda, 3D & Adat",
+                card4Desc: "PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D modellek (.stl -> .obj) és ZIP/CBZ archívumok feldolgozása.",
+                
+                // Kategóriák
+                catImage: "Képfájl",
+                catPsd: "Adobe Photoshop (.psd)",
+                catTiff: "TIFF Képfájl",
+                catHeic: "Apple HEIC/HEIF Fotó",
+                catVideo: "Videófájl",
+                catAudio: "Hangfájl",
+                catPdf: "PDF Dokumentum",
+                catWord: "Word Dokumentum",
+                catOfficeZip: "Prezentáció / E-Könyv",
+                cat3d: "3D Modell (STL)",
+                catData: "Táblázat / Adatfájl",
+                catZip: "Archívum / Képregény",
+                catText: "Szöveg / Forráskód",
+                catOther: "Egyéb Fájl",
+
+                // Konverziós opciók
+                optPng: "PNG Kép (.png)",
+                optJpg: "JPG Kép (.jpg)",
+                optWebp: "WebP Kép (.webp)",
+                optIco: "Weboldal Favicon 64x64 (.ico)",
+                optPdfImg: "PDF Dokumentum (.pdf)",
+                optBase64: "Base64 Kódolt Szöveg (.txt)",
+                
+                optVideoMp3: "Hangsáv kinyerése MP3-ként (.mp3)",
+                optVideoWav: "Hangsáv kinyerése WAV fájlként (.wav)",
+                optVideoMov: "Átalakítás Apple QuickTime (.mov) videóvá",
+                optVideoMp4: "Átalakítás MP4 (.mp4) videóvá",
+                optVideoWebm: "Átalakítás WebM (.webm) videóvá",
+                optVideoThumbPng: "Borítókép / Jelenet mentése PNG-ként (.png)",
+                optVideoThumbJpg: "Borítókép / Jelenet mentése JPG-ként (.jpg)",
+
+                optAudioMp3: "MP3 Hangfájl (.mp3) - Állítható bitrátával",
+                optWav: "Tömörítetlen WAV Hangfájl (.wav)",
+
+                optPdfToPng: "Oldalak mentése PNG képként (.png / .zip)",
+                optPdfToJpg: "Oldalak mentése JPG képként (.jpg / .zip)",
+                optPdfToTxt: "Szöveg kinyerése a PDF-ből (.txt)",
+
+                optHtml: "Weboldal / HTML dokumentum (.html)",
+                optTxt: "Tiszta szöveges fájl (.txt)",
+                optMd: "Markdown dokumentum (.md)",
+
+                optStlToObj: "Wavefront 3D Modell (.obj)",
+                optStlToJson: "3D Geometria Adatok (.json)",
+
+                optXlsx: "Excel Táblázat (.xlsx)",
+                optCsv: "CSV Adatfájl (.csv)",
+                optJson: "JSON Adatfájl (.json)",
+                optYaml: "YAML Konfiguráció (.yaml)",
+                optHtmlTable: "HTML Táblázat (.html)",
+
+                optZipListTxt: "Fájllista kinyerése szövegként (.txt)",
+                optZipListJson: "Fájllista kinyerése JSON formátumban (.json)",
+                optZipFirstImg: "Első kép / Borító kicsomagolása a csomagból"
+            },
+            en: {
+                pageTitle: "Universal File Converter",
+                mainTitle: "Universal File Converter",
+                creator: "Created by: Márton Nagy",
+                heroTitle: "Convert and fine-tune your files with ease",
+                heroSub: "Customize resolution (up to 2K/4K), bitrate, or image dimensions before saving. The tool automatically highlights your file's original values.",
+                dropTitle: "Click to choose a file, or drag and drop it here",
+                dropSub: "Videos (MP4, MOV, WebM - 4K/2K), Audio (MP3, WAV), Images (PSD, HEIC, TIFF, PNG, JPG), PDF, Word, Excel, 3D",
+                fileInfoTitle: "Selected File",
+                resetBtnText: "Choose another file",
+                labelName: "File Name",
+                labelType: "Detected Format",
+                labelSize: "File Size",
+                origTag: "Original",
+                origKeep: "Keep Original",
+
+                // Image panel
+                imgPanelTitle: "Image Quality & Resolution Settings",
+                qualityLabel: "Image quality and compression",
+                lblImgScale: "Quick Scale",
+                lblImgWidth: "Width (px)",
+                lblImgHeight: "Height (px)",
+                lblImgFilter: "Color Profile / Filter",
+                optFilterNone: "Original Colors",
+                optFilterGray: "Grayscale (Black & White)",
+                optFilterSepia: "Sepia Tone",
+                lblKeepAspect: "Lock aspect ratio (prevent distortion)",
+
+                // Video panel
+                vidPanelTitle: "Video & Audio Track Settings",
+                lblVidRes: "Video Resolution",
+                lblVidBitrate: "Video Bitrate (Quality)",
+                lblVidFps: "Frame Rate (FPS)",
+                lblVidAudioBitrate: "MP3 / Audio Bitrate",
+
+                // Audio panel
+                audPanelTitle: "Audio Quality & Bitrate Settings",
+                lblAudBitrate: "MP3 Bitrate",
+                lblAudSampleRate: "Sample Rate (Hz)",
+                lblAudChannels: "Audio Channels",
+                optAudStereo: "Stereo (2 Channels)",
+                optAudMono: "Mono (1 Channel)",
+
+                targetLabel: "Choose target format for conversion:",
+                convertBtnText: "Start Conversion",
+                converting: "Processing your file, please wait...",
+                convertingVideo: "Transcoding video (recording with selected resolution and bitrate)...",
+                convertingMp3: "Encoding MP3 audio with selected bitrate...",
+                successMsg: "Your converted file is ready for download!",
+                downloadBtnText: "Download File",
+                footerText: "Privacy first: All file conversions happen directly inside your browser. No files are ever uploaded to external servers.",
+                errorGeneric: "Could not convert file: ",
+
+                card1Title: "PRO Images & Resolution",
+                card1Desc: "Photoshop (.psd), HEIC, TIFF, PNG, JPG conversion with custom pixel resizing, filters, and 100% quality.",
+                card2Title: "4K / 2K Video & MP3",
+                card2Desc: "Convert videos to MOV, MP4, WebM up to 4K/2K resolution. Extract audio tracks to MP3 or WAV.",
+                card3Title: "Audio Studio & Bitrate",
+                card3Desc: "Convert MP3 and WAV with original parameter detection and adjustable bitrate (64-320 kbps).",
+                card4Title: "Office, 3D & Data",
+                card4Desc: "Process PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D models (.stl -> .obj) and ZIP/CBZ archives.",
+
+                // Categories
+                catImage: "Image File",
+                catPsd: "Adobe Photoshop (.psd)",
+                catTiff: "TIFF Image",
+                catHeic: "Apple HEIC/HEIF Photo",
+                catVideo: "Video File",
+                catAudio: "Audio File",
+                catPdf: "PDF Document",
+                catWord: "Word Document",
+                catOfficeZip: "Presentation / E-Book",
+                cat3d: "3D Model (STL)",
+                catData: "Spreadsheet / Data",
+                catZip: "Archive / Comic Book",
+                catText: "Text / Source Code",
+                catOther: "Other File",
+
+                // Options
+                optPng: "PNG Image (.png)",
+                optJpg: "JPG Image (.jpg)",
+                optWebp: "WebP Image (.webp)",
+                optIco: "Website Favicon 64x64 (.ico)",
+                optPdfImg: "PDF Document (.pdf)",
+                optBase64: "Base64 Encoded String (.txt)",
+
+                optVideoMp3: "Extract Audio Track as MP3 (.mp3)",
+                optVideoWav: "Extract Audio Track as WAV (.wav)",
+                optVideoMov: "Convert to Apple QuickTime Video (.mov)",
+                optVideoMp4: "Convert to MP4 Video (.mp4)",
+                optVideoWebm: "Convert to WebM Video (.webm)",
+                optVideoThumbPng: "Save Video Frame as PNG (.png)",
+                optVideoThumbJpg: "Save Video Frame as JPG (.jpg)",
+
+                optAudioMp3: "MP3 Audio File (.mp3) - Custom Bitrate",
+                optWav: "Uncompressed WAV Audio (.wav)",
+
+                optPdfToPng: "Render Pages as PNG Images (.png / .zip)",
+                optPdfToJpg: "Render Pages as JPG Images (.jpg / .zip)",
+                optPdfToTxt: "Extract All Text from PDF (.txt)",
+
+                optHtml: "HTML Document (.html)",
+                optTxt: "Plain Text File (.txt)",
+                optMd: "Markdown Document (.md)",
+
+                optStlToObj: "Wavefront 3D Model (.obj)",
+                optStlToJson: "3D Geometry Data (.json)",
+
+                optXlsx: "Excel Spreadsheet (.xlsx)",
+                optCsv: "CSV Data File (.csv)",
+                optJson: "JSON Data File (.json)",
+                optYaml: "YAML Configuration (.yaml)",
+                optHtmlTable: "HTML Table (.html)",
+
+                optZipListTxt: "Extract File List as Text (.txt)",
+                optZipListJson: "Extract File List as JSON (.json)",
+                optZipFirstImg: "Extract First Image / Cover from Archive"
+            }
+        };
+
+        let currentLang = 'hu';
+        let selectedFile = null;
+        let detectedCategory = '';
+        let currentImgAspect = 1;
+        let origImgWidth = 0;
+        let origImgHeight = 0;
+
+        // Eredeti média metaadatok tárolása
+        let videoMeta = { width: 0, height: 0, duration: 0, bitrateBps: 0, fps: 30, audioKbps: 192 };
+        let audioMeta = { sampleRate: 0, channels: 0, duration: 0, bitrateKbps: 0 };
+
+        // --- DOM Elemek ---
+        const langHuBtn = document.getElementById('langHu');
+        const langEnBtn = document.getElementById('langEn');
+        const themeToggle = document.getElementById('themeToggle');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const panel = document.getElementById('panel');
+        const resetBtn = document.getElementById('resetBtn');
+        const fileNameEl = document.getElementById('fileName');
+        const fileTypeEl = document.getElementById('fileType');
+        const fileSizeEl = document.getElementById('fileSize');
+
+        const imageSettingsPanel = document.getElementById('imageSettingsPanel');
+        const videoSettingsPanel = document.getElementById('videoSettingsPanel');
+        const audioSettingsPanel = document.getElementById('audioSettingsPanel');
+
+        const qualityRange = document.getElementById('qualityRange');
+        const qualityValue = document.getElementById('qualityValue');
+        const imgScaleSelect = document.getElementById('imgScaleSelect');
+        const imgWidthInput = document.getElementById('imgWidthInput');
+        const imgHeightInput = document.getElementById('imgHeightInput');
+        const imgFilterSelect = document.getElementById('imgFilterSelect');
+        const keepAspectCheckbox = document.getElementById('keepAspectCheckbox');
+        const origDimensionsBadge = document.getElementById('origDimensionsBadge');
+        const origVideoMetaBadge = document.getElementById('origVideoMetaBadge');
+        const origAudioMetaBadge = document.getElementById('origAudioMetaBadge');
+
+        const vidResSelect = document.getElementById('vidResSelect');
+        const vidBitrateSelect = document.getElementById('vidBitrateSelect');
+        const vidFpsSelect = document.getElementById('vidFpsSelect');
+        const vidAudioBitrateSelect = document.getElementById('vidAudioBitrateSelect');
+
+        const audBitrateSelect = document.getElementById('audBitrateSelect');
+        const audSampleRateSelect = document.getElementById('audSampleRateSelect');
+        const audChannelsSelect = document.getElementById('audChannelsSelect');
+
+        const targetFormatSelect = document.getElementById('targetFormat');
+        const convertBtn = document.getElementById('convertBtn');
+        const statusBox = document.getElementById('statusBox');
+        const downloadArea = document.getElementById('downloadArea');
+        const downloadLink = document.getElementById('downloadLink');
+
+        // --- 2. TÉMA VÁLTÁS ---
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // --- 3. NYELVVÁLTÁS ---
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            document.title = t.pageTitle;
+            const ids = [
+                'mainTitle', 'creatorText', 'heroTitle', 'heroSub', 'dropTitle', 'dropSub',
+                'fileInfoTitle', 'resetBtnText', 'labelName', 'labelType', 'labelSize',
+                'imgPanelTitle', 'qualityLabel', 'lblImgScale', 'lblImgWidth', 'lblImgHeight',
+                'lblImgFilter', 'optFilterNone', 'optFilterGray', 'optFilterSepia', 'lblKeepAspect',
+                'vidPanelTitle', 'lblVidRes', 'lblVidBitrate', 'lblVidFps', 'lblVidAudioBitrate',
+                'audPanelTitle', 'lblAudBitrate', 'lblAudSampleRate', 'lblAudChannels',
+                'targetLabel', 'convertBtnText', 'successMsg',
+                'downloadBtnText', 'footerText', 'card1Title', 'card1Desc', 'card2Title', 'card2Desc',
+                'card3Title', 'card3Desc', 'card4Title', 'card4Desc'
+            ];
+
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && t[id === 'creatorText' ? 'creator' : id]) {
+                    el.textContent = t[id === 'creatorText' ? 'creator' : id];
+                }
+            });
+
+            if (lang === 'hu') {
+                langHuBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-400 shadow-sm";
+                langEnBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
+            } else {
+                langEnBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-400 shadow-sm";
+                langHuBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
+            }
+
+            if (selectedFile) {
+                updateFileDisplay(selectedFile);
+            }
+        }
+
+        langHuBtn.addEventListener('click', () => setLanguage('hu'));
+        langEnBtn.addEventListener('click', () => setLanguage('en'));
+
+        // --- 4. KÉPMÉRETEZŐ INTERAKCIÓK ---
+        qualityRange.addEventListener('input', (e) => {
+            qualityValue.textContent = e.target.value + '%';
+        });
+
+        imgScaleSelect.addEventListener('change', () => {
+            if (origImgWidth > 0 && origImgHeight > 0) {
+                const scale = parseInt(imgScaleSelect.value, 10) / 100;
+                imgWidthInput.value = Math.round(origImgWidth * scale);
+                imgHeightInput.value = Math.round(origImgHeight * scale);
+            }
+        });
+
+        imgWidthInput.addEventListener('input', () => {
+            const w = parseInt(imgWidthInput.value, 10);
+            if (keepAspectCheckbox.checked && w > 0 && currentImgAspect > 0) {
+                imgHeightInput.value = Math.round(w / currentImgAspect);
+            }
+        });
+
+        imgHeightInput.addEventListener('input', () => {
+            const h = parseInt(imgHeightInput.value, 10);
+            if (keepAspectCheckbox.checked && h > 0 && currentImgAspect > 0) {
+                imgWidthInput.value = Math.round(h * currentImgAspect);
+            }
+        });
+
+        // --- 5. FÁJLKEZELÉS ÉS EREDETI ÉRTÉKEK KIOLVASÁSA ---
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        resetBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            panel.classList.add('hidden');
+            downloadArea.classList.add('hidden');
+            statusBox.classList.add('hidden');
+        });
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-teal-600', 'bg-teal-50/50', 'dark:bg-slate-800');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-teal-600', 'bg-teal-50/50', 'dark:bg-slate-800');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function detectCategory(file) {
+            const name = file.name.toLowerCase();
+            const type = file.type.toLowerCase();
+
+            if (name.endsWith('.psd') || type.includes('photoshop')) return 'psd';
+            if (/\.(tif|tiff)$/.test(name) || type === 'image/tiff') return 'tiff';
+            if (/\.(heic|heif)$/.test(name) || type.includes('heic') || type.includes('heif')) return 'heic';
+            if (type.startsWith('image/') || /\.(png|jpg|jpeg|webp|gif|bmp|svg|ico)$/.test(name)) return 'image';
+            if (type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|m4v)$/.test(name)) return 'video';
+            if (type.startsWith('audio/') || /\.(mp3|wav|ogg|flac|m4a|aac)$/.test(name)) return 'audio';
+            if (type === 'application/pdf' || name.endsWith('.pdf')) return 'pdf';
+            if (name.endsWith('.docx')) return 'word';
+            if (/\.(pptx|odt|epub)$/.test(name)) return 'office_zip';
+            if (name.endsWith('.stl')) return 'model3d';
+            if (/\.(xlsx|xls|csv|json|yaml|yml)$/.test(name) || type.includes('spreadsheet') || type.includes('csv') || type.includes('json') || type.includes('yaml')) return 'data';
+            if (/\.(zip|cbz)$/.test(name) || type.includes('zip')) return 'zip';
+            if (type.startsWith('text/') || /\.(txt|md|html|htm|xml|js|css|py|c|cpp|ini|log|sql|sh)$/.test(name)) return 'text';
+            return 'other';
+        }
+
+        // Videó metaadatok kiolvasása
+        function probeVideoMetadata(file) {
+            return new Promise((resolve) => {
+                const v = document.createElement('video');
+                v.preload = 'metadata';
+                const url = URL.createObjectURL(file);
+                v.src = url;
+                v.onloadedmetadata = () => {
+                    const dur = v.duration || 1;
+                    const totalBps = Math.round((file.size * 8) / dur);
+                    const estAudioKbps = 192;
+                    const estVideoBps = Math.max(500000, totalBps - (estAudioKbps * 1000));
+                    const meta = {
+                        width: v.videoWidth || 1920,
+                        height: v.videoHeight || 1080,
+                        duration: dur,
+                        bitrateBps: estVideoBps,
+                        fps: 30,
+                        audioKbps: estAudioKbps
+                    };
+                    URL.revokeObjectURL(url);
+                    resolve(meta);
+                };
+                v.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve({ width: 0, height: 0, duration: 0, bitrateBps: 8000000, fps: 30, audioKbps: 192 });
+                };
+            });
+        }
+
+        // Hang metaadatok kiolvasása
+        async function probeAudioMetadata(file) {
+            try {
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                const dur = audioBuffer.duration || 1;
+                const rawKbps = Math.round((file.size * 8) / dur / 1000);
+                const stdRates = [64, 128, 192, 256, 320];
+                let closestKbps = rawKbps;
+                if (file.name.toLowerCase().endsWith('.mp3')) {
+                    closestKbps = stdRates.reduce((prev, curr) => Math.abs(curr - rawKbps) < Math.abs(prev - rawKbps) ? curr : prev);
+                }
+                if (audioCtx.close) audioCtx.close();
+                return {
+                    sampleRate: audioBuffer.sampleRate,
+                    channels: audioBuffer.numberOfChannels,
+                    duration: dur,
+                    bitrateKbps: closestKbps
+                };
+            } catch (e) {
+                return { sampleRate: 44100, channels: 2, duration: 0, bitrateKbps: 192 };
+            }
+        }
+
+        async function handleFile(file) {
+            selectedFile = file;
+            detectedCategory = detectCategory(file);
+            panel.classList.remove('hidden');
+            downloadArea.classList.add('hidden');
+            statusBox.classList.add('hidden');
+
+            origImgWidth = 0;
+            origImgHeight = 0;
+            imgWidthInput.value = '';
+            imgHeightInput.value = '';
+            imgScaleSelect.value = '100';
+            imgFilterSelect.value = 'none';
+            origDimensionsBadge.textContent = '';
+            origVideoMetaBadge.textContent = '';
+            origAudioMetaBadge.textContent = '';
+
+            if (detectedCategory === 'image') {
+                try {
+                    const dataUrl = await readFileAsDataURL(file);
+                    const img = await loadImage(dataUrl);
+                    origImgWidth = img.width;
+                    origImgHeight = img.height;
+                    currentImgAspect = img.width / img.height;
+                    imgWidthInput.value = img.width;
+                    imgHeightInput.value = img.height;
+                    origDimensionsBadge.textContent = `${ i18n[currentLang].origTag }: ${img.width} × ${img.height} px`;
+                } catch (e) {}
+            } else if (detectedCategory === 'video') {
+                videoMeta = await probeVideoMetadata(file);
+            } else if (detectedCategory === 'audio') {
+                audioMeta = await probeAudioMetadata(file);
+            }
+
+            updateFileDisplay(file);
+        }
+
+        // Videó legördülő menük felépítése az eredeti értékek jelölésével (és 2K/4K opcióval)
+        function populateVideoSettingsUI() {
+            const t = i18n[currentLang];
+            const origTag = t.origTag;
+            const w = videoMeta.width;
+            const h = videoMeta.height;
+            const mbps = (videoMeta.bitrateBps / 1000000).toFixed(1);
+
+            if (w > 0 && h > 0) {
+                origVideoMetaBadge.textContent = `${origTag}: ${w}×${h} px | ~${mbps} Mbps | ${videoMeta.duration.toFixed(1)}s`;
+            }
+
+            // 1. Felbontás menü (4K és 2K opcióval)
+            const resOptions = [
+                { val: 'original', label: w > 0 ? `${t.origKeep} (${w}×${h} px)` : t.origKeep },
+                { val: '2160', label: `4K Ultra HD - 3840×2160 (2160p)${h === 2160 ? ` (${origTag})` : ''}` },
+                { val: '1440', label: `2K QHD - 2560×1440 (1440p)${h === 1440 ? ` (${origTag})` : ''}` },
+                { val: '1080', label: `1080p Full HD - 1920×1080${h === 1080 ? ` (${origTag})` : ''}` },
+                { val: '720', label: `720p HD - 1280×720${h === 720 ? ` (${origTag})` : ''}` },
+                { val: '480', label: `480p SD - 854×480${h === 480 ? ` (${origTag})` : ''}` },
+                { val: '360', label: `360p - 640×360${h === 360 ? ` (${origTag})` : ''}` }
+            ];
+            vidResSelect.innerHTML = '';
+            resOptions.forEach(o => {
+                const el = document.createElement('option');
+                el.value = o.val;
+                el.textContent = o.label;
+                vidResSelect.appendChild(el);
+            });
+
+            // 2. Videó Bitráta menü
+            const origBpsVal = videoMeta.bitrateBps || 8000000;
+            const brOptions = [
+                { val: String(origBpsVal), label: `${t.origKeep} (~${mbps} Mbps)` },
+                { val: '45000000', label: '45 Mbps (4K Ultra HD)' },
+                { val: '25000000', label: '25 Mbps (2K QHD)' },
+                { val: '16000000', label: '16 Mbps (1080p Pro)' },
+                { val: '8000000', label: '8 Mbps (Full HD)' },
+                { val: '5000000', label: '5 Mbps (HD)' },
+                { val: '2500000', label: '2.5 Mbps (Web)' },
+                { val: '1000000', label: '1 Mbps (Kis méret)' }
+            ];
+            vidBitrateSelect.innerHTML = '';
+            brOptions.forEach(o => {
+                const el = document.createElement('option');
+                el.value = o.val;
+                el.textContent = o.label;
+                vidBitrateSelect.appendChild(el);
+            });
+
+            // 3. FPS menü
+            const fpsOptions = [
+                { val: '30', label: `30 FPS (${origTag} / Standard)` },
+                { val: '60', label: '60 FPS (Sima mozgás / 60Hz)' },
+                { val: '24', label: '24 FPS (Filmes)' }
+            ];
+            vidFpsSelect.innerHTML = '';
+            fpsOptions.forEach(o => {
+                const el = document.createElement('option');
+                el.value = o.val;
+                el.textContent = o.label;
+                vidFpsSelect.appendChild(el);
+            });
+
+            // 4. Videó Hang Bitráta menü
+            const audRates = [320, 256, 192, 128, 64];
+            vidAudioBitrateSelect.innerHTML = '';
+            audRates.forEach(kbps => {
+                const el = document.createElement('option');
+                el.value = String(kbps);
+                const isOrig = kbps === videoMeta.audioKbps;
+                el.textContent = `${kbps} kbps${isOrig ? ` (${origTag})` : ''}`;
+                if (isOrig) el.selected = true;
+                vidAudioBitrateSelect.appendChild(el);
+            });
+        }
+
+        // Hang legördülő menük felépítése az eredeti értékek jelölésével
+        function populateAudioSettingsUI() {
+            const t = i18n[currentLang];
+            const origTag = t.origTag;
+            const sr = audioMeta.sampleRate;
+            const ch = audioMeta.channels;
+            const kbps = audioMeta.bitrateKbps;
+
+            if (sr > 0) {
+                const chText = ch === 1 ? 'Mono' : 'Stereo';
+                origAudioMetaBadge.textContent = `${origTag}: ~${kbps} kbps | ${sr} Hz | ${chText}`;
+            }
+
+            // 1. MP3 Bitráta menü
+            const stdRates = [320, 256, 192, 128, 64];
+            audBitrateSelect.innerHTML = '';
+            const hasExactRate = stdRates.includes(kbps);
+
+            if (!hasExactRate && kbps > 0) {
+                const customSelected = Math.min(320, Math.max(64, kbps));
+                const el = document.createElement('option');
+                el.value = String(customSelected);
+                el.textContent = `${customSelected} kbps (${origTag}: ~${kbps} kbps)`;
+                el.selected = true;
+                audBitrateSelect.appendChild(el);
+            }
+
+            stdRates.forEach(r => {
+                const el = document.createElement('option');
+                el.value = String(r);
+                const isOrig = r === kbps;
+                el.textContent = `${r} kbps${isOrig ? ` (${origTag})` : ''}`;
+                if (isOrig) el.selected = true;
+                audBitrateSelect.appendChild(el);
+            });
+
+            // 2. Sample Rate menü
+            const srList = [48000, 44100, 32000, 22050];
+            audSampleRateSelect.innerHTML = '';
+            const origSrOpt = document.createElement('option');
+            origSrOpt.value = 'original';
+            origSrOpt.textContent = sr > 0 ? `${t.origKeep} (${sr} Hz)` : t.origKeep;
+            audSampleRateSelect.appendChild(origSrOpt);
+
+            srList.forEach(hz => {
+                const el = document.createElement('option');
+                el.value = String(hz);
+                el.textContent = `${hz} Hz${hz === sr ? ` (${origTag})` : ''}`;
+                audSampleRateSelect.appendChild(el);
+            });
+
+            // 3. Csatornák menü
+            audChannelsSelect.innerHTML = '';
+            const stereoOpt = document.createElement('option');
+            stereoOpt.value = 'stereo';
+            stereoOpt.textContent = `${t.optAudStereo}${ch >= 2 ? ` (${origTag})` : ''}`;
+            if (ch >= 2) stereoOpt.selected = true;
+
+            const monoOpt = document.createElement('option');
+            monoOpt.value = 'mono';
+            monoOpt.textContent = `${t.optAudMono}${ch === 1 ? ` (${origTag})` : ''}`;
+            if (ch === 1) monoOpt.selected = true;
+
+            audChannelsSelect.appendChild(stereoOpt);
+            audChannelsSelect.appendChild(monoOpt);
+        }
+
+        function updateFileDisplay(file) {
+            const t = i18n[currentLang];
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatBytes(file.size);
+
+            const catMap = {
+                image: t.catImage, psd: t.catPsd, tiff: t.catTiff, heic: t.catHeic,
+                video: t.catVideo, audio: t.catAudio, pdf: t.catPdf, word: t.catWord,
+                office_zip: t.catOfficeZip, model3d: t.cat3d, data: t.catData,
+                zip: t.catZip, text: t.catText, other: t.catOther
+            };
+
+            const ext = file.name.includes('.') ? file.name.split('.').pop().toUpperCase() : 'FILE';
+            fileTypeEl.textContent = `${catMap[detectedCategory]} (.${ext.toLowerCase()})`;
+
+            if (origImgWidth > 0 && origImgHeight > 0) {
+                origDimensionsBadge.textContent = `${t.origTag}: ${origImgWidth} × ${origImgHeight} px`;
+            }
+
+            imageSettingsPanel.classList.add('hidden');
+            videoSettingsPanel.classList.add('hidden');
+            audioSettingsPanel.classList.add('hidden');
+
+            if (['image', 'psd', 'tiff', 'heic'].includes(detectedCategory)) {
+                imageSettingsPanel.classList.remove('hidden');
+            } else if (detectedCategory === 'video') {
+                videoSettingsPanel.classList.remove('hidden');
+                populateVideoSettingsUI();
+            } else if (detectedCategory === 'audio') {
+                audioSettingsPanel.classList.remove('hidden');
+                populateAudioSettingsUI();
+            }
+
+            targetFormatSelect.innerHTML = '';
+            let options = [];
+
+            if (['image', 'psd', 'tiff', 'heic'].includes(detectedCategory)) {
+                options = [
+                    { val: 'image/png', label: t.optPng },
+                    { val: 'image/jpeg', label: t.optJpg },
+                    { val: 'image/webp', label: t.optWebp },
+                    { val: 'application/pdf', label: t.optPdfImg },
+                    { val: 'image/ico', label: t.optIco },
+                    { val: 'text/base64', label: t.optBase64 }
+                ];
+            } else if (detectedCategory === 'video') {
+                options = [
+                    { val: 'video/mp3', label: t.optVideoMp3 },
+                    { val: 'video/wav', label: t.optVideoWav },
+                    { val: 'video/mov', label: t.optVideoMov },
+                    { val: 'video/mp4', label: t.optVideoMp4 },
+                    { val: 'video/webm', label: t.optVideoWebm },
+                    { val: 'video/thumb-png', label: t.optVideoThumbPng },
+                    { val: 'video/thumb-jpg', label: t.optVideoThumbJpg }
+                ];
+            } else if (detectedCategory === 'audio') {
+                options = [
+                    { val: 'audio/mp3', label: t.optAudioMp3 },
+                    { val: 'audio/wav', label: t.optWav },
+                    { val: 'text/base64', label: t.optBase64 }
+                ];
+            } else if (detectedCategory === 'pdf') {
+                options = [
+                    { val: 'pdf/png', label: t.optPdfToPng },
+                    { val: 'pdf/jpg', label: t.optPdfToJpg },
+                    { val: 'pdf/txt', label: t.optPdfToTxt }
+                ];
+            } else if (detectedCategory === 'word') {
+                options = [
+                    { val: 'text/html', label: t.optHtml },
+                    { val: 'text/plain', label: t.optTxt },
+                    { val: 'text/markdown', label: t.optMd }
+                ];
+            } else if (detectedCategory === 'office_zip') {
+                options = [
+                    { val: 'text/plain', label: t.optTxt },
+                    { val: 'text/html', label: t.optHtml }
+                ];
+            } else if (detectedCategory === 'model3d') {
+                options = [
+                    { val: 'model/obj', label: t.optStlToObj },
+                    { val: 'model/json', label: t.optStlToJson }
+                ];
+            } else if (detectedCategory === 'data') {
+                options = [
+                    { val: 'xlsx', label: t.optXlsx },
+                    { val: 'csv', label: t.optCsv },
+                    { val: 'json', label: t.optJson },
+                    { val: 'yaml', label: t.optYaml },
+                    { val: 'html', label: t.optHtmlTable }
+                ];
+            } else if (detectedCategory === 'zip') {
+                options = [
+                    { val: 'zip/txt', label: t.optZipListTxt },
+                    { val: 'zip/json', label: t.optZipListJson },
+                    { val: 'zip/first-img', label: t.optZipFirstImg }
+                ];
+            } else if (detectedCategory === 'text') {
+                options = [
+                    { val: 'application/pdf', label: t.optPdfImg },
+                    { val: 'text/html', label: t.optHtml },
+                    { val: 'text/plain', label: t.optTxt },
+                    { val: 'text/base64', label: t.optBase64 }
+                ];
+            } else {
+                options = [
+                    { val: 'text/base64', label: t.optBase64 },
+                    { val: 'text/plain', label: t.optTxt }
+                ];
+            }
+
+            options.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt.val;
+                el.textContent = opt.label;
+                targetFormatSelect.appendChild(el);
+            });
+        }
+
+        // --- 6. KONVERTÁLÁSI LOGIKA ---
+        function showStatus(msg, isError = false) {
+            statusBox.classList.remove('hidden');
+            statusBox.textContent = msg;
+            if (isError) {
+                statusBox.className = "mt-5 p-4 rounded-xl text-xs font-medium text-center bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300 border border-red-200 dark:border-red-800/80";
+            } else {
+                statusBox.className = "mt-5 p-4 rounded-xl text-xs font-medium text-center bg-teal-50 text-teal-800 dark:bg-teal-950/50 dark:text-teal-300 border border-teal-200 dark:border-teal-800/80";
+            }
+        }
+
+        function triggerDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadLink.download = filename;
+            statusBox.classList.add('hidden');
+            downloadArea.classList.remove('hidden');
+        }
+
+        function getBaseName(filename) {
+            return filename.includes('.') ? filename.substring(0, filename.lastIndexOf('.')) : filename;
+        }
+
+        function exportCanvasToTarget(sourceCanvas, target, baseName, quality) {
+            let targetW = parseInt(imgWidthInput.value, 10);
+            let targetH = parseInt(imgHeightInput.value, 10);
+
+            if (!targetW || targetW <= 0) {
+                const scale = parseInt(imgScaleSelect.value, 10) / 100;
+                targetW = Math.round(sourceCanvas.width * scale);
+                targetH = Math.round(sourceCanvas.height * scale);
+            } else if (!targetH || targetH <= 0) {
+                targetH = Math.round(targetW / (sourceCanvas.width / sourceCanvas.height));
+            }
+
+            if (target === 'image/ico') {
+                targetW = 64;
+                targetH = 64;
+            }
+
+            const outCanvas = document.createElement('canvas');
+            outCanvas.width = targetW;
+            outCanvas.height = targetH;
+            const ctx = outCanvas.getContext('2d');
+
+            if (target === 'image/jpeg' || target === 'application/pdf') {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, targetW, targetH);
+            }
+
+            const filterVal = imgFilterSelect.value;
+            if (filterVal === 'grayscale') {
+                ctx.filter = 'grayscale(100%)';
+            } else if (filterVal === 'sepia') {
+                ctx.filter = 'sepia(100%)';
+            }
+
+            ctx.drawImage(sourceCanvas, 0, 0, targetW, targetH);
+
+            if (target === 'application/pdf') {
+                const { jsPDF } = window.jspdf;
+                const orientation = targetW > targetH ? 'l' : 'p';
+                const pdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'px',
+                    format: [targetW, targetH]
+                });
+                const imgData = outCanvas.toDataURL('image/jpeg', quality);
+                pdf.addImage(imgData, 'JPEG', 0, 0, targetW, targetH);
+                triggerDownload(pdf.output('blob'), `${baseName}.pdf`);
+            } else if (target === 'image/ico') {
+                outCanvas.toBlob((blob) => {
+                    triggerDownload(blob, `${baseName}_favicon.ico`);
+                }, 'image/png');
+            } else {
+                const ext = target.split('/')[1] === 'jpeg' ? 'jpg' : target.split('/')[1];
+                outCanvas.toBlob((blob) => {
+                    triggerDownload(blob, `${baseName}_${targetW}x${targetH}.${ext}`);
+                }, target, quality);
+            }
+        }
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            const t = i18n[currentLang];
+            const target = targetFormatSelect.value;
+            const baseName = getBaseName(selectedFile.name);
+            const quality = parseInt(qualityRange.value, 10) / 100;
+
+            downloadArea.classList.add('hidden');
+            
+            if (target.endsWith('mp3')) {
+                showStatus(t.convertingMp3, false);
+            } else if (detectedCategory === 'video') {
+                showStatus(t.convertingVideo, false);
+            } else {
+                showStatus(t.converting, false);
+            }
+
+            try {
+                if (target === 'text/base64') {
+                    const dataUrl = await readFileAsDataURL(selectedFile);
+                    const blob = new Blob([dataUrl], { type: 'text/plain;charset=utf-8' });
+                    triggerDownload(blob, `${baseName}_base64.txt`);
+                    return;
+                }
+
+                // 1. KÉPEK
+                if (detectedCategory === 'image') {
+                    const dataUrl = await readFileAsDataURL(selectedFile);
+                    const img = await loadImage(dataUrl);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width || 800;
+                    canvas.height = img.height || 600;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    exportCanvasToTarget(canvas, target, baseName, quality);
+                }
+
+                // 2. PSD
+                else if (detectedCategory === 'psd') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const psd = agPsd.readPsd(arrayBuffer);
+                    if (!psd || !psd.canvas) {
+                        throw new Error("A PSD fájl nem tartalmaz összevont előnézeti képet.");
+                    }
+                    exportCanvasToTarget(psd.canvas, target, baseName, quality);
+                }
+
+                // 3. TIFF
+                else if (detectedCategory === 'tiff') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const ifds = UTIF.decode(arrayBuffer);
+                    UTIF.decodeImage(arrayBuffer, ifds[0]);
+                    const rgba = UTIF.toRGBA8(ifds[0]);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = ifds[0].width;
+                    canvas.height = ifds[0].height;
+                    const ctx = canvas.getContext('2d');
+                    const imgData = ctx.createImageData(canvas.width, canvas.height);
+                    imgData.data.set(rgba);
+                    ctx.putImageData(imgData, 0, 0);
+                    exportCanvasToTarget(canvas, target, baseName, quality);
+                }
+
+                // 4. HEIC
+                else if (detectedCategory === 'heic') {
+                    const convertedBlob = await heic2any({
+                        blob: selectedFile,
+                        toType: 'image/png',
+                        quality: 1.0
+                    });
+                    const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+                    const dataUrl = await readFileAsDataURL(singleBlob);
+                    const img = await loadImage(dataUrl);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    exportCanvasToTarget(canvas, target, baseName, quality);
+                }
+
+                // 5. VIDEÓFÁJLOK (2K/4K skálázással, MOV/MP4/WebM és MP3/WAV hangsávval)
+                else if (detectedCategory === 'video') {
+                    const audioKbps = parseInt(vidAudioBitrateSelect.value, 10);
+                    const videoBps = parseInt(vidBitrateSelect.value, 10);
+                    const targetRes = vidResSelect.value;
+                    const targetFps = parseInt(vidFpsSelect.value, 10);
+
+                    if (target === 'video/mp3') {
+                        const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                        const mp3Blob = audioBufferToMp3(audioBuffer, audioKbps, 'stereo');
+                        triggerDownload(mp3Blob, `${baseName}_${audioKbps}kbps.mp3`);
+                    } else if (target === 'video/wav') {
+                        const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                        const wavBlob = audioBufferToWav(audioBuffer);
+                        triggerDownload(wavBlob, `${baseName}_audio.wav`);
+                    } else if (target === 'video/thumb-png' || target === 'video/thumb-jpg') {
+                        const isPng = target.endsWith('png');
+                        const blob = await extractVideoFrame(selectedFile, isPng ? 'image/png' : 'image/jpeg', 1.0, targetRes);
+                        const resSuffix = targetRes === 'original' ? 'orig' : `${targetRes}p`;
+                        triggerDownload(blob, `${baseName}_jelenet_${resSuffix}.${isPng ? 'png' : 'jpg'}`);
+                    } else if (target === 'video/mov' || target === 'video/mp4' || target === 'video/webm') {
+                        const ext = target.split('/')[1];
+                        const resLabel = targetRes === 'original' ? 'orig' : (targetRes === '2160' ? '4K' : (targetRes === '1440' ? '2K' : `${targetRes}p`));
+                        const transcodedBlob = await transcodeVideoWithSettings(selectedFile, ext, targetRes, videoBps, targetFps);
+                        triggerDownload(transcodedBlob, `${baseName}_${resLabel}.${ext}`);
+                    }
+                }
+
+                // 6. HANGFÁJLOK
+                else if (detectedCategory === 'audio') {
+                    const kbps = parseInt(audBitrateSelect.value, 10);
+                    const srSetting = audSampleRateSelect.value;
+                    const chSetting = audChannelsSelect.value;
+
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    let audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                    const targetSampleRate = srSetting === 'original' ? audioBuffer.sampleRate : parseInt(srSetting, 10);
+                    const targetChannels = chSetting === 'mono' ? 1 : audioBuffer.numberOfChannels;
+
+                    if (targetSampleRate !== audioBuffer.sampleRate || targetChannels !== audioBuffer.numberOfChannels) {
+                        audioBuffer = await resampleAudioBuffer(audioBuffer, targetSampleRate, targetChannels);
+                    }
+
+                    if (target === 'audio/mp3') {
+                        const mp3Blob = audioBufferToMp3(audioBuffer, kbps, chSetting);
+                        triggerDownload(mp3Blob, `${baseName}_${kbps}kbps.mp3`);
+                    } else {
+                        const wavBlob = audioBufferToWav(audioBuffer);
+                        triggerDownload(wavBlob, `${baseName}_${targetSampleRate}Hz.wav`);
+                    }
+                }
+
+                // 7. PDF
+                else if (detectedCategory === 'pdf') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const pdfLib = window['pdfjs-dist/build/pdf'];
+                    const pdf = await pdfLib.getDocument({ data: arrayBuffer }).promise;
+
+                    if (target === 'pdf/txt') {
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            const strings = content.items.map(item => item.str);
+                            fullText += `--- ${i}. oldal ---\n` + strings.join(' ') + '\n\n';
+                        }
+                        triggerDownload(new Blob([fullText], { type: 'text/plain;charset=utf-8' }), `${baseName}.txt`);
+                    } else {
+                        const isPng = target === 'pdf/png';
+                        const mime = isPng ? 'image/png' : 'image/jpeg';
+                        const ext = isPng ? 'png' : 'jpg';
+
+                        if (pdf.numPages === 1) {
+                            const page = await pdf.getPage(1);
+                            const viewport = page.getViewport({ scale: 2.0 });
+                            const canvas = document.createElement('canvas');
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+                            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                            canvas.toBlob((blob) => triggerDownload(blob, `${baseName}.${ext}`), mime, 1.0);
+                        } else {
+                            const zip = new JSZip();
+                            for (let i = 1; i <= pdf.numPages; i++) {
+                                const page = await pdf.getPage(i);
+                                const viewport = page.getViewport({ scale: 2.0 });
+                                const canvas = document.createElement('canvas');
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+                                await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                                const blob = await new Promise(res => canvas.toBlob(res, mime, 1.0));
+                                zip.file(`${baseName}_oldal_${i}.${ext}`, blob);
+                            }
+                            const zipBlob = await zip.generateAsync({ type: 'blob' });
+                            triggerDownload(zipBlob, `${baseName}_oldalak.zip`);
+                        }
+                    }
+                }
+
+                // 8. WORD (.DOCX)
+                else if (detectedCategory === 'word') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    if (target === 'text/html') {
+                        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                        const htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${baseName}</title><style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#1e293b;}</style></head><body>${result.value}</body></html>`;
+                        triggerDownload(new Blob([htmlContent], { type: 'text/html;charset=utf-8' }), `${baseName}.html`);
+                    } else if (target === 'text/markdown') {
+                        const result = await mammoth.convertToMarkdown({ arrayBuffer: arrayBuffer });
+                        triggerDownload(new Blob([result.value], { type: 'text/markdown;charset=utf-8' }), `${baseName}.md`);
+                    } else {
+                        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                        triggerDownload(new Blob([result.value], { type: 'text/plain;charset=utf-8' }), `${baseName}.txt`);
+                    }
+                }
+
+                // 9. PREZENTÁCIÓ ÉS E-KÖNYV
+                else if (detectedCategory === 'office_zip') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const zip = await JSZip.loadAsync(arrayBuffer);
+                    const extractedParagraphs = [];
+                    const parser = new DOMParser();
+
+                    const fileNames = Object.keys(zip.files).sort();
+                    for (const path of fileNames) {
+                        if (/\.(xml|xhtml|html|htm)$/i.test(path) && !path.includes('styles') && !path.includes('theme')) {
+                            const content = await zip.files[path].async('string');
+                            const xmlDoc = parser.parseFromString(content, 'text/xml');
+                            const textContent = xmlDoc.documentElement ? xmlDoc.documentElement.textContent.trim() : '';
+                            if (textContent.length > 0) {
+                                extractedParagraphs.push(textContent.replace(/\s+/g, ' '));
+                            }
+                        }
+                    }
+
+                    const fullText = extractedParagraphs.join('\n\n');
+                    if (target === 'text/html') {
+                        const htmlBody = extractedParagraphs.map(p => `<p>${p}</p>`).join('\n');
+                        const htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${baseName}</title><style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#1e293b;}</style></head><body>${htmlBody}</body></html>`;
+                        triggerDownload(new Blob([htmlDoc], { type: 'text/html;charset=utf-8' }), `${baseName}.html`);
+                    } else {
+                        triggerDownload(new Blob([fullText], { type: 'text/plain;charset=utf-8' }), `${baseName}.txt`);
+                    }
+                }
+
+                // 10. 3D MODELL
+                else if (detectedCategory === 'model3d') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const mesh = parseStl(arrayBuffer);
+
+                    if (target === 'model/obj') {
+                        let objText = `# Converted by Universal File Converter\n`;
+                        mesh.vertices.forEach(v => {
+                            objText += `v ${v[0]} ${v[1]} ${v[2]}\n`;
+                        });
+                        mesh.faces.forEach(f => {
+                            objText += `f ${f[0]} ${f[1]} ${f[2]}\n`;
+                        });
+                        triggerDownload(new Blob([objText], { type: 'text/plain;charset=utf-8' }), `${baseName}.obj`);
+                    } else {
+                        triggerDownload(new Blob([JSON.stringify(mesh, null, 2)], { type: 'application/json;charset=utf-8' }), `${baseName}_3d.json`);
+                    }
+                }
+
+                // 11. TÁBLÁZAT ÉS ADAT
+                else if (detectedCategory === 'data') {
+                    const nameLower = selectedFile.name.toLowerCase();
+                    let workbook;
+                    let jsonData = null;
+
+                    if (nameLower.endsWith('.json')) {
+                        const text = await readFileAsText(selectedFile);
+                        jsonData = JSON.parse(text);
+                        const arrData = Array.isArray(jsonData) ? jsonData : [jsonData];
+                        const worksheet = XLSX.utils.json_to_sheet(arrData);
+                        workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, "Adatok");
+                    } else if (nameLower.endsWith('.yaml') || nameLower.endsWith('.yml')) {
+                        const text = await readFileAsText(selectedFile);
+                        jsonData = jsyaml.load(text);
+                        const arrData = Array.isArray(jsonData) ? jsonData : [jsonData];
+                        const worksheet = XLSX.utils.json_to_sheet(arrData);
+                        workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, "Adatok");
+                    } else {
+                        const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                        workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    }
+
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                    if (target === 'xlsx') {
+                        const outBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                        triggerDownload(new Blob([outBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${baseName}.xlsx`);
+                    } else if (target === 'csv') {
+                        const csv = XLSX.utils.sheet_to_csv(firstSheet);
+                        triggerDownload(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${baseName}.csv`);
+                    } else if (target === 'json') {
+                        triggerDownload(new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json;charset=utf-8' }), `${baseName}.json`);
+                    } else if (target === 'yaml') {
+                        const yamlStr = jsyaml.dump(jsonData);
+                        triggerDownload(new Blob([yamlStr], { type: 'text/yaml;charset=utf-8' }), `${baseName}.yaml`);
+                    } else if (target === 'html') {
+                        const htmlTable = XLSX.utils.sheet_to_html(firstSheet);
+                        triggerDownload(new Blob([htmlTable], { type: 'text/html;charset=utf-8' }), `${baseName}.html`);
+                    }
+                }
+
+                // 12. ZIP
+                else if (detectedCategory === 'zip') {
+                    const arrayBuffer = await readFileAsArrayBuffer(selectedFile);
+                    const zip = await JSZip.loadAsync(arrayBuffer);
+                    
+                    if (target === 'zip/first-img') {
+                        const imgEntries = Object.keys(zip.files).sort().filter(n => /\.(png|jpg|jpeg|webp|gif)$/i.test(n) && !zip.files[n].dir);
+                        if (imgEntries.length === 0) {
+                            throw new Error("Nem található képfájl az archívumban.");
+                        }
+                        const firstEntry = zip.files[imgEntries[0]];
+                        const imgBlob = await firstEntry.async('blob');
+                        const ext = imgEntries[0].split('.').pop();
+                        triggerDownload(imgBlob, `${baseName}_borito.${ext}`);
+                    } else {
+                        const fileList = [];
+                        zip.forEach((relativePath, zipEntry) => {
+                            fileList.push({
+                                nev: zipEntry.name,
+                                mappa: zipEntry.dir,
+                                datum: zipEntry.date
+                            });
+                        });
+
+                        if (target === 'zip/json') {
+                            triggerDownload(new Blob([JSON.stringify(fileList, null, 2)], { type: 'application/json;charset=utf-8' }), `${baseName}_tartalom.json`);
+                        } else {
+                            const txtLines = fileList.map(f => `${f.mappa ? '[MAPPA] ' : '        '}${f.nev}`).join('\n');
+                            triggerDownload(new Blob([txtLines], { type: 'text/plain;charset=utf-8' }), `${baseName}_tartalom.txt`);
+                        }
+                    }
+                }
+
+                // 13. SZÖVEGES FÁJLOK
+                else {
+                    const text = await readFileAsText(selectedFile);
+                    if (target === 'text/html') {
+                        const parsedHtml = marked.parse(text);
+                        const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${baseName}</title><style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#1e293b;}</style></head><body>${parsedHtml}</body></html>`;
+                        triggerDownload(new Blob([fullHtml], { type: 'text/html;charset=utf-8' }), `${baseName}.html`);
+                    } else if (target === 'application/pdf') {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        const lines = doc.splitTextToSize(text, 180);
+                        let y = 15;
+                        for (let i = 0; i < lines.length; i++) {
+                            if (y > 280) {
+                                doc.addPage();
+                                y = 15;
+                            }
+                            doc.text(lines[i], 15, y);
+                            y += 7;
+                        }
+                        triggerDownload(doc.output('blob'), `${baseName}.pdf`);
+                    } else {
+                        triggerDownload(new Blob([text], { type: 'text/plain;charset=utf-8' }), `${baseName}.txt`);
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                showStatus(t.errorGeneric + (err.message || ''), true);
+            }
+        });
+
+        // --- SEGÉDFÜGGVÉNYEK ---
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        async function resampleAudioBuffer(audioBuffer, targetSampleRate, targetChannels) {
+            const offlineCtx = new OfflineAudioContext(
+                targetChannels,
+                Math.ceil(audioBuffer.duration * targetSampleRate),
+                targetSampleRate
+            );
+            const bufferSource = offlineCtx.createBufferSource();
+            bufferSource.buffer = audioBuffer;
+            bufferSource.connect(offlineCtx.destination);
+            bufferSource.start(0);
+            return await offlineCtx.startRendering();
+        }
+
+        function audioBufferToMp3(audioBuffer, kbps = 192, channelMode = 'stereo') {
+            const channels = (channelMode === 'mono' || audioBuffer.numberOfChannels === 1) ? 1 : 2;
+            const sampleRate = audioBuffer.sampleRate;
+            const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
+            const mp3Data = [];
+
+            const leftFloat = audioBuffer.getChannelData(0);
+            const rightFloat = channels === 2 ? audioBuffer.getChannelData(1) : null;
+
+            const sampleBlockSize = 1152;
+            const leftInt16 = new Int16Array(leftFloat.length);
+            const rightInt16 = channels === 2 ? new Int16Array(rightFloat.length) : null;
+
+            for (let i = 0; i < leftFloat.length; i++) {
+                let s = Math.max(-1, Math.min(1, leftFloat[i]));
+                leftInt16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                if (channels === 2) {
+                    let sr = Math.max(-1, Math.min(1, rightFloat[i]));
+                    rightInt16[i] = sr < 0 ? sr * 0x8000 : sr * 0x7FFF;
+                }
+            }
+
+            for (let i = 0; i < leftInt16.length; i += sampleBlockSize) {
+                const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
+                let mp3buf;
+                if (channels === 2) {
+                    const rightChunk = rightInt16.subarray(i, i + sampleBlockSize);
+                    mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+                } else {
+                    mp3buf = mp3encoder.encodeBuffer(leftChunk);
+                }
+                if (mp3buf.length > 0) mp3Data.push(mp3buf);
+            }
+
+            const flushBuf = mp3encoder.flush();
+            if (flushBuf.length > 0) mp3Data.push(flushBuf);
+
+            return new Blob(mp3Data, { type: 'audio/mpeg' });
+        }
+
+        function extractVideoFrame(file, mimeType, quality, targetRes) {
+            return new Promise((resolve, reject) => {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.muted = true;
+                video.playsInline = true;
+                const url = URL.createObjectURL(file);
+                video.src = url;
+
+                video.onloadedmetadata = () => {
+                    video.currentTime = Math.min(1.0, video.duration / 2);
+                };
+
+                video.onseeked = () => {
+                    let w = video.videoWidth || 1920;
+                    let h = video.videoHeight || 1080;
+                    if (targetRes !== 'original') {
+                        const targetH = parseInt(targetRes, 10);
+                        w = Math.round(targetH * (w / h));
+                        h = targetH;
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(video, 0, 0, w, h);
+                    canvas.toBlob((blob) => {
+                        URL.revokeObjectURL(url);
+                        resolve(blob);
+                    }, mimeType, quality);
+                };
+
+                video.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error("A videófájl nem olvasható."));
+                };
+            });
+        }
+
+        function transcodeVideoWithSettings(file, targetExt, targetRes, videoBitsPerSecond, fps) {
+            return new Promise((resolve, reject) => {
+                const video = document.createElement('video');
+                video.muted = false;
+                video.playsInline = true;
+                const url = URL.createObjectURL(file);
+                video.src = url;
+
+                video.onloadedmetadata = () => {
+                    let w = video.videoWidth || 1920;
+                    let h = video.videoHeight || 1080;
+
+                    if (targetRes !== 'original') {
+                        const newH = parseInt(targetRes, 10);
+                        w = Math.round(newH * (w / h));
+                        if (w % 2 !== 0) w++;
+                        h = newH;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    const canvasStream = canvas.captureStream(fps);
+
+                    const origStream = video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
+                    if (origStream && origStream.getAudioTracks().length > 0) {
+                        canvasStream.addTrack(origStream.getAudioTracks()[0]);
+                    }
+
+                    let mimeCandidates = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+                    if (targetExt === 'mp4' || targetExt === 'mov') {
+                        mimeCandidates = [
+                            'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+                            'video/mp4',
+                            'video/webm;codecs=h264',
+                            'video/webm'
+                        ];
+                    }
+
+                    let chosenMime = '';
+                    for (const m of mimeCandidates) {
+                        if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) {
+                            chosenMime = m;
+                            break;
+                        }
+                    }
+
+                    const recorderOptions = { videoBitsPerSecond: videoBitsPerSecond };
+                    if (chosenMime) recorderOptions.mimeType = chosenMime;
+
+                    let recorder;
+                    try {
+                        recorder = new MediaRecorder(canvasStream, recorderOptions);
+                    } catch (e) {
+                        recorder = new MediaRecorder(canvasStream);
+                    }
+
+                    const chunks = [];
+                    recorder.ondataavailable = (e) => {
+                        if (e.data && e.data.size > 0) chunks.push(e.data);
+                    };
+
+                    recorder.onstop = () => {
+                        URL.revokeObjectURL(url);
+                        const outMime = targetExt === 'mov' ? 'video/quicktime' : (targetExt === 'mp4' ? 'video/mp4' : 'video/webm');
+                        resolve(new Blob(chunks, { type: outMime }));
+                    };
+
+                    function drawFrame() {
+                        if (!video.paused && !video.ended) {
+                            ctx.drawImage(video, 0, 0, w, h);
+                            requestAnimationFrame(drawFrame);
+                        }
+                    }
+
+                    video.onplay = () => {
+                        drawFrame();
+                    };
+
+                    video.onended = () => {
+                        if (recorder.state === 'recording') recorder.stop();
+                    };
+
+                    recorder.start();
+                    video.play().catch(err => {
+                        URL.revokeObjectURL(url);
+                        reject(err);
+                    });
+                };
+
+                video.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error("A videófájl nem támogatott."));
+                };
+            });
+        }
+
+        function parseStl(buffer) {
+            const view = new DataView(buffer);
+            const vertices = [];
+            const faces = [];
+
+            if (buffer.byteLength > 84) {
+                const numTriangles = view.getUint32(80, true);
+                if (84 + numTriangles * 50 === buffer.byteLength) {
+                    let offset = 84;
+                    for (let i = 0; i < numTriangles; i++) {
+                        offset += 12;
+                        const vIndices = [];
+                        for (let j = 0; j < 3; j++) {
+                            const vx = parseFloat(view.getFloat32(offset, true).toFixed(5));
+                            const vy = parseFloat(view.getFloat32(offset + 4, true).toFixed(5));
+                            const vz = parseFloat(view.getFloat32(offset + 8, true).toFixed(5));
+                            offset += 12;
+                            vertices.push([vx, vy, vz]);
+                            vIndices.push(vertices.length);
+                        }
+                        faces.push(vIndices);
+                        offset += 2;
+                    }
+                    return { triangleCount: numTriangles, vertices, faces };
+                }
+            }
+
+            const text = new TextDecoder().decode(buffer);
+            const lines = text.split('\n');
+            let currentFace = [];
+            for (const line of lines) {
+                const parts = line.trim().split(/\s+/);
+                if (parts[0] === 'vertex') {
+                    vertices.push([parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3])]);
+                    currentFace.push(vertices.length);
+                    if (currentFace.length === 3) {
+                        faces.push(currentFace);
+                        currentFace = [];
+                    }
+                }
+            }
+            return { triangleCount: faces.length, vertices, faces };
+        }
+
+        function audioBufferToWav(buffer) {
+            const numOfChan = buffer.numberOfChannels;
+            const length = buffer.length * numOfChan * 2 + 44;
+            const out = new ArrayBuffer(length);
+            const view = new DataView(out);
+            const channels = [];
+            let sample;
+            let offset = 0;
+            let pos = 0;
+
+            function setUint16(data) {
+                view.setUint16(pos, data, true);
+                pos += 2;
+            }
+            function setUint32(data) {
+                view.setUint32(pos, data, true);
+                pos += 4;
+            }
+
+            setUint32(0x46464952);
+            setUint32(length - 8);
+            setUint32(0x45564157);
+            setUint32(0x20746d66);
+            setUint32(16);
+            setUint16(1);
+            setUint16(numOfChan);
+            setUint32(buffer.sampleRate);
+            setUint32(buffer.sampleRate * 2 * numOfChan);
+            setUint16(numOfChan * 2);
+            setUint16(16);
+            setUint32(0x61746164);
+            setUint32(length - pos - 4);
+
+            for (let i = 0; i < buffer.numberOfChannels; i++) {
+                channels.push(buffer.getChannelData(i));
+            }
+
+            while (pos < length) {
+                for (let i = 0; i < numOfChan; i++) {
+                    sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+                    view.setInt16(pos, sample, true);
+                    pos += 2;
+                }
+                offset++;
+            }
+
+            return new Blob([out], { type: 'audio/wav' });
+        }
+    </script>
+</body>
+</html>
