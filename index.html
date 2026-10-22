@@ -44,7 +44,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 
     <style>
-        /* Természetes, visszafogott iOS Frosted Glass stílus */
         .ios-glass {
             background: rgba(18, 22, 25, 0.55);
             backdrop-filter: blur(30px) saturate(160%);
@@ -61,7 +60,6 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
 
-        /* Statikus, letisztult iOS infókártyák hover zavarás nélkül */
         .ios-info-card {
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.035) 0%, rgba(18, 22, 25, 0.5) 100%);
             backdrop-filter: blur(24px) saturate(150%);
@@ -102,6 +100,14 @@
             box-shadow: 0 6px 20px rgba(20, 184, 166, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25);
         }
 
+        /* Folytonos, tiszta szegélyű kapszula (nem szaggatott) */
+        .creator-capsule {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(203, 213, 225, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
@@ -110,19 +116,20 @@
 </head>
 <body class="bg-[#09090b] text-slate-300 min-h-screen flex flex-col justify-between antialiased selection:bg-teal-600 selection:text-white relative overflow-x-hidden">
 
-    <!-- Konténerbe zárt gördülő háttérfények: soha nem nyújtják túl a lapot fekete űrrel -->
+    <!-- Háttérfények -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div class="absolute -top-16 -left-16 w-[520px] h-[520px] bg-teal-600/20 rounded-full blur-[130px]"></div>
-        <div class="absolute top-1/2 -right-24 -translate-y-1/2 w-[480px] h-[480px] bg-emerald-700/15 rounded-full blur-[140px]"></div>
-        <div class="absolute -bottom-16 -left-16 w-[540px] h-[540px] bg-teal-800/18 rounded-full blur-[130px]"></div>
+        <div class="absolute -top-16 -left-16 w-72 sm:w-[520px] h-72 sm:h-[520px] bg-teal-600/20 rounded-full blur-[100px] sm:blur-[130px]"></div>
+        <div class="absolute top-1/2 -right-24 -translate-y-1/2 w-72 sm:w-[480px] h-72 sm:h-[480px] bg-emerald-700/15 rounded-full blur-[100px] sm:blur-[140px]"></div>
+        <div class="absolute -bottom-16 -left-16 w-72 sm:w-[540px] h-72 sm:h-[540px] bg-teal-800/18 rounded-full blur-[100px] sm:blur-[130px]"></div>
     </div>
 
     <!-- Fejléc -->
-    <header class="bg-[#09090b]/35 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-20 transition-all duration-300 shrink-0">
-        <div class="max-w-4xl mx-auto px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-            <div class="flex items-center gap-3.5">
-                <!-- Fogaskerekes fájl logó iOS üveg hatásban -->
-                <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-teal-400 shadow-inner backdrop-blur-md">
+    <header class="bg-[#09090b]/40 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-20 transition-all duration-300 shrink-0">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            
+            <!-- Logó, Cím és Kapszula (folytonos szegéllyel) -->
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-teal-400 shadow-inner backdrop-blur-md shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
                         <path d="M4 6.8V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.8"></path>
@@ -135,84 +142,76 @@
                         <path d="M11 15.7l-.9-.5"></path>
                     </svg>
                 </div>
-                <div>
-                    <h1 id="mainTitle" class="text-xl font-bold tracking-tight text-white">
+                
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <h1 id="mainTitle" class="text-base sm:text-lg font-bold tracking-tight text-white whitespace-nowrap">
                         Univerzális Fájlkonvertáló
                     </h1>
-                    <p id="creatorText" class="text-xs font-medium text-slate-400">
+                    <span id="creatorText" class="text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full creator-capsule border inline-flex items-center">
                         Készítette: Nagy Márton
-                    </p>
+                    </span>
                 </div>
             </div>
 
-            <!-- Nyelv, Téma és Főoldal vezérlők -->
-            <div class="flex items-center gap-3">
-                <a href="https://nagymarton06.github.io/Homepage/" id="homeBtn" class="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-teal-400 transition-colors shadow-sm flex items-center justify-center backdrop-blur-md" aria-label="Főoldal" title="Főoldal">
+            <!-- Jobb oldali vezérlők (csak a Főoldal és a Nyelvválasztó maradt) -->
+            <div class="flex items-center justify-center gap-2.5 sm:gap-3">
+                <a href="https://nagymarton06.github.io/Homepage/" id="homeBtn" class="p-2 sm:p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-teal-400 transition-colors shadow-sm flex items-center justify-center backdrop-blur-md" aria-label="Főoldal" title="Főoldal">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
                 </a>
 
-                <div class="inline-flex rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
-                    <button id="langHu" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm">
+                <div class="inline-flex rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-md">
+                    <button id="langHu" class="px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm">
                         Magyar
                     </button>
-                    <button id="langEn" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200">
+                    <button id="langEn" class="px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200">
                         English
                     </button>
                 </div>
-
-                <button id="themeToggle" class="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-teal-400 transition-colors shadow-sm backdrop-blur-md" aria-label="Téma váltása">
-                    <svg class="w-4 h-4 block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                </button>
             </div>
         </div>
     </header>
 
     <!-- Fő tartalom -->
-    <main class="max-w-4xl w-full mx-auto px-6 py-5 sm:py-6 flex-grow flex flex-col justify-center">
+    <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-grow flex flex-col justify-center">
         
-        <!-- Bevezető rész -->
-        <div class="text-center max-w-2xl mx-auto mb-5 sm:mb-6">
-            <h2 id="heroTitle" class="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
+        <div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+            <h2 id="heroTitle" class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">
                 Alakítsd át és finomhangold fájljaidat egyszerűen
             </h2>
-            <p id="heroSub" class="text-sm text-slate-400 leading-relaxed">
+            <p id="heroSub" class="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Állíts be egyedi felbontást (akár 2K/4K-ig), bitrátát vagy képméretet mentés előtt. A rendszer automatikusan megjelöli a fájl eredeti értékeit.
             </p>
         </div>
 
-        <!-- Fő munkaterület kártya (iOS Frosted Glass) -->
-        <div class="ios-glass rounded-3xl p-5 sm:p-7 transition-all">
+        <!-- Munkaterület -->
+        <div class="ios-glass rounded-2xl sm:rounded-3xl p-4 sm:p-7 transition-all">
             
-            <!-- Feltöltő zóna (Dropzone) -->
-            <div id="dropZone" class="border-2 border-dashed border-white/15 hover:border-teal-500/50 rounded-2xl p-6 sm:p-10 text-center cursor-pointer transition-all bg-white/[0.02] hover:bg-white/[0.05] group">
+            <div id="dropZone" class="border-2 border-dashed border-white/15 hover:border-teal-500/50 rounded-2xl p-5 sm:p-10 text-center cursor-pointer transition-all bg-white/[0.02] hover:bg-white/[0.05] group">
                 <input type="file" id="fileInput" class="hidden">
                 <div class="flex flex-col items-center pointer-events-none">
-                    <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/5 border border-white/10 text-teal-400 flex items-center justify-center mb-3 sm:mb-4 shadow-inner group-hover:scale-105 group-hover:border-teal-500/40 transition-all">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-white/5 border border-white/10 text-teal-400 flex items-center justify-center mb-3 sm:mb-4 shadow-inner group-hover:scale-105 transition-all">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.75 3.75 0 0118 19.5H6.75z"></path>
                         </svg>
                     </div>
-                    <p id="dropTitle" class="text-base font-semibold text-slate-200">
+                    <p id="dropTitle" class="text-sm sm:text-base font-semibold text-slate-200">
                         Kattints a fájl kiválasztásához, vagy húzd ide
                     </p>
-                    <p id="dropSub" class="text-xs text-slate-400 mt-1.5">
+                    <p id="dropSub" class="text-[11px] sm:text-xs text-slate-400 mt-2 max-w-sm sm:max-w-none mx-auto leading-relaxed">
                         Videók (MP4, MOV, WebM - 4K/2K), Hang (MP3, WAV), Képek (PSD, HEIC, TIFF, PNG, JPG), PDF, Word, Excel, 3D
                     </p>
                 </div>
             </div>
 
-            <!-- Kiválasztott fájl és beállítások panel -->
-            <div id="panel" class="hidden mt-6 pt-6 border-t border-white/10">
+            <div id="panel" class="hidden mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-white/10">
                 
-                <div class="flex items-center justify-between mb-4">
-                    <span id="fileInfoTitle" class="text-xs font-bold uppercase tracking-wider text-teal-400">
+                <div class="flex items-center justify-between mb-3.5 sm:mb-4">
+                    <span id="fileInfoTitle" class="text-[11px] font-bold uppercase tracking-wider text-teal-400">
                         Kiválasztott fájl
                     </span>
-                    <button id="resetBtn" class="text-xs font-medium text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors">
+                    <button id="resetBtn" class="text-[11px] font-medium text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -220,15 +219,14 @@
                     </button>
                 </div>
 
-                <!-- Fájl adatkártya -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 ios-glass-card p-4 rounded-2xl text-sm">
-                    <div class="overflow-hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 ios-glass-card p-4 rounded-xl text-sm">
+                    <div class="min-w-0">
                         <span id="labelName" class="text-xs text-slate-400 block">Fájl neve</span>
                         <span id="fileName" class="font-semibold text-white truncate block mt-0.5"></span>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                         <span id="labelType" class="text-xs text-slate-400 block">Felismert típus</span>
-                        <span id="fileType" class="font-semibold text-teal-400 block mt-0.5"></span>
+                        <span id="fileType" class="font-semibold text-teal-400 block mt-0.5 truncate"></span>
                     </div>
                     <div>
                         <span id="labelSize" class="text-xs text-slate-400 block">Fájlméret</span>
@@ -236,26 +234,26 @@
                     </div>
                 </div>
 
-                <!-- 1. KÉP BEÁLLÍTÁSOK PANEL -->
-                <div id="imageSettingsPanel" class="hidden mt-5 ios-glass-card p-5 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
-                        <span id="imgPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <!-- 1. KÉP BEÁLLÍTÁSOK -->
+                <div id="imageSettingsPanel" class="hidden mt-5 ios-glass-card p-4 sm:p-5 rounded-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/10 pb-2.5">
+                        <span id="imgPanelTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
                             Képminőség és Felbontás Beállítások
                         </span>
-                        <span id="origDimensionsBadge" class="text-xs font-semibold text-teal-400"></span>
+                        <span id="origDimensionsBadge" class="text-[11px] font-semibold text-teal-400"></span>
                     </div>
 
                     <div>
-                        <div class="flex justify-between text-xs font-medium text-slate-300 mb-1.5">
+                        <div class="flex justify-between text-[11px] font-medium text-slate-300 mb-1.5">
                             <label id="qualityLabel" for="qualityRange">Képminőség és tömörítés</label>
                             <span id="qualityValue" class="font-bold text-teal-400">100%</span>
                         </div>
                         <input type="range" id="qualityRange" min="10" max="100" value="100" step="5" class="w-full accent-teal-500 cursor-pointer">
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
-                        <div>
-                            <label id="lblImgScale" class="block text-xs text-slate-400 mb-1">Gyors átméretezés</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                        <div class="col-span-2 sm:col-span-1">
+                            <label id="lblImgScale" class="block text-[11px] text-slate-400 mb-1">Gyors átméretezés</label>
                             <select id="imgScaleSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                                 <option value="100" class="bg-zinc-900">100% (Eredeti)</option>
                                 <option value="75" class="bg-zinc-900">75%</option>
@@ -266,95 +264,94 @@
                             </select>
                         </div>
                         <div>
-                            <label id="lblImgWidth" class="block text-xs text-slate-400 mb-1">Szélesség (px)</label>
+                            <label id="lblImgWidth" class="block text-[11px] text-slate-400 mb-1">Szélesség (px)</label>
                             <input type="number" id="imgWidthInput" min="1" max="12000" placeholder="Auto" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                         </div>
                         <div>
-                            <label id="lblImgHeight" class="block text-xs text-slate-400 mb-1">Magasság (px)</label>
+                            <label id="lblImgHeight" class="block text-[11px] text-slate-400 mb-1">Magasság (px)</label>
                             <input type="number" id="imgHeightInput" min="1" max="12000" placeholder="Auto" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                         </div>
-                        <div>
-                            <label id="lblImgFilter" class="block text-xs text-slate-400 mb-1">Színprofil / Effekt</label>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label id="lblImgFilter" class="block text-[11px] text-slate-400 mb-1">Effekt</label>
                             <select id="imgFilterSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
-                                <option value="none" id="optFilterNone" class="bg-zinc-900">Eredeti színek</option>
-                                <option value="grayscale" id="optFilterGray" class="bg-zinc-900">Fekete-fehér (Szürke)</option>
-                                <option value="sepia" id="optFilterSepia" class="bg-zinc-900">Szépia (Nosztalgia)</option>
+                                <option value="none" id="optFilterNone" class="bg-zinc-900">Eredeti</option>
+                                <option value="grayscale" id="optFilterGray" class="bg-zinc-900">Fekete-fehér</option>
+                                <option value="sepia" id="optFilterSepia" class="bg-zinc-900">Szépia</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-1">
+                    <div class="flex items-center gap-2 pt-0.5">
                         <input type="checkbox" id="keepAspectCheckbox" checked class="rounded text-teal-500 focus:ring-teal-500 cursor-pointer accent-teal-600">
-                        <label id="lblKeepAspect" for="keepAspectCheckbox" class="text-xs text-slate-400 cursor-pointer select-none">
+                        <label id="lblKeepAspect" for="keepAspectCheckbox" class="text-xs text-slate-400 cursor-pointer select-none leading-none">
                             Oldalarány megtartása (ne torzuljon a kép)
                         </label>
                     </div>
                 </div>
 
-                <!-- 2. VIDEÓ BEÁLLÍTÁSOK PANEL -->
-                <div id="videoSettingsPanel" class="hidden mt-5 ios-glass-card p-5 rounded-2xl space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
-                        <span id="vidPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <!-- 2. VIDEÓ BEÁLLÍTÁSOK -->
+                <div id="videoSettingsPanel" class="hidden mt-5 ios-glass-card p-4 sm:p-5 rounded-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/10 pb-2.5">
+                        <span id="vidPanelTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
                             Videó és Hangsáv Beállítások
                         </span>
-                        <span id="origVideoMetaBadge" class="text-xs font-semibold text-teal-400"></span>
+                        <span id="origVideoMetaBadge" class="text-[11px] font-semibold text-teal-400"></span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div id="vidResBox">
-                            <label id="lblVidRes" class="block text-xs text-slate-400 mb-1">Videó Felbontás</label>
-                            <select id="vidResSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label id="lblVidRes" class="block text-[11px] text-slate-400 mb-1">Videó Felbontás</label>
+                            <select id="vidResSelect" class="w-full ios-input rounded-xl px-2.5 py-2 text-xs font-medium truncate">
                             </select>
                         </div>
-                        <div id="vidBitrateBox">
-                            <label id="lblVidBitrate" class="block text-xs text-slate-400 mb-1">Videó Bitráta (Minőség)</label>
-                            <select id="vidBitrateSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
+                        <div>
+                            <label id="lblVidBitrate" class="block text-[11px] text-slate-400 mb-1">Videó Bitráta</label>
+                            <select id="vidBitrateSelect" class="w-full ios-input rounded-xl px-2.5 py-2 text-xs font-medium">
                             </select>
                         </div>
-                        <div id="vidFpsBox">
-                            <label id="lblVidFps" class="block text-xs text-slate-400 mb-1">Képkockasebesség (FPS)</label>
-                            <select id="vidFpsSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
+                        <div>
+                            <label id="lblVidFps" class="block text-[11px] text-slate-400 mb-1">Sebesség (FPS)</label>
+                            <select id="vidFpsSelect" class="w-full ios-input rounded-xl px-2.5 py-2 text-xs font-medium">
                             </select>
                         </div>
-                        <div id="vidAudioBitrateBox">
-                            <label id="lblVidAudioBitrate" class="block text-xs text-slate-400 mb-1">MP3 / Hang Bitráta</label>
-                            <select id="vidAudioBitrateSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
+                        <div>
+                            <label id="lblVidAudioBitrate" class="block text-[11px] text-slate-400 mb-1">Hang Bitráta</label>
+                            <select id="vidAudioBitrateSelect" class="w-full ios-input rounded-xl px-2.5 py-2 text-xs font-medium">
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. HANGFÁJL BEÁLLÍTÁSOK PANEL -->
-                <div id="audioSettingsPanel" class="hidden mt-5 ios-glass-card p-5 rounded-2xl space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
-                        <span id="audPanelTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <!-- 3. HANG BEÁLLÍTÁSOK -->
+                <div id="audioSettingsPanel" class="hidden mt-5 ios-glass-card p-4 sm:p-5 rounded-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/10 pb-2.5">
+                        <span id="audPanelTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
                             Hangminőség és Bitráta Beállítások
                         </span>
-                        <span id="origAudioMetaBadge" class="text-xs font-semibold text-teal-400"></span>
+                        <span id="origAudioMetaBadge" class="text-[11px] font-semibold text-teal-400"></span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div id="audBitrateBox">
-                            <label id="lblAudBitrate" class="block text-xs text-slate-400 mb-1">MP3 Bitráta</label>
+                        <div>
+                            <label id="lblAudBitrate" class="block text-[11px] text-slate-400 mb-1">MP3 Bitráta</label>
                             <select id="audBitrateSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                             </select>
                         </div>
                         <div>
-                            <label id="lblAudSampleRate" class="block text-xs text-slate-400 mb-1">Mintavételezés (Sample Rate)</label>
+                            <label id="lblAudSampleRate" class="block text-[11px] text-slate-400 mb-1">Mintavételezés (Hz)</label>
                             <select id="audSampleRateSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                             </select>
                         </div>
                         <div>
-                            <label id="lblAudChannels" class="block text-xs text-slate-400 mb-1">Hangcsatornák</label>
+                            <label id="lblAudChannels" class="block text-[11px] text-slate-400 mb-1">Hangcsatornák</label>
                             <select id="audChannelsSelect" class="w-full ios-input rounded-xl px-3 py-2 text-xs font-medium">
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Konverzió vezérlő -->
-                <div class="mt-6">
-                    <label id="targetLabel" for="targetFormat" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <div class="mt-5 sm:mt-6">
+                    <label id="targetLabel" for="targetFormat" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
                         Milyen formátumba szeretnéd átalakítani?
                     </label>
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -370,15 +367,13 @@
                     </div>
                 </div>
 
-                <!-- Folyamatjelző / Hibaüzenet -->
-                <div id="statusBox" class="hidden mt-5 p-4 rounded-xl text-xs font-medium text-center"></div>
+                <div id="statusBox" class="hidden mt-4 sm:mt-5 p-4 rounded-xl text-xs font-medium text-center"></div>
 
-                <!-- Letöltés doboz -->
-                <div id="downloadArea" class="hidden mt-6 p-5 rounded-2xl bg-teal-500/10 border border-teal-500/30 text-center backdrop-blur-md">
-                    <p id="successMsg" class="text-teal-300 text-sm font-semibold mb-3">
+                <div id="downloadArea" class="hidden mt-5 sm:mt-6 p-5 rounded-xl bg-teal-500/10 border border-teal-500/30 text-center backdrop-blur-md">
+                    <p id="successMsg" class="text-teal-300 text-xs sm:text-sm font-semibold mb-3">
                         Az új fájl elkészült, máris letöltheted!
                     </p>
-                    <a id="downloadLink" class="inline-flex items-center gap-2 btn-teal-glass text-white text-sm font-semibold px-8 py-3 rounded-xl shadow-sm" download="konvertalt_fajl">
+                    <a id="downloadLink" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-teal-glass text-white text-sm font-semibold px-8 py-3.5 rounded-xl shadow-sm" download="konvertalt_fajl">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
@@ -388,30 +383,29 @@
             </div>
         </div>
 
-        <!-- Támogatott formátumok áttekintő kártyák (Statikus, prémium iOS widget stílus hover villanás nélkül) -->
-        <div class="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-            <div class="ios-info-card p-4 rounded-2xl">
-                <h3 id="card1Title" class="text-xs font-bold uppercase tracking-wider text-teal-400 mb-1">PRO Kép & Felbontás</h3>
+        <div class="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="ios-info-card p-4.5 rounded-xl">
+                <h3 id="card1Title" class="text-[11px] font-bold uppercase tracking-wider text-teal-400 mb-1">PRO Kép & Felbontás</h3>
                 <p id="card1Desc" class="text-xs text-slate-400 leading-relaxed">Photoshop (.psd), HEIC, TIFF, PNG, JPG konvertálás egyedi pixel méretezéssel, szűrőkkel és 100% minőségben.</p>
             </div>
-            <div class="ios-info-card p-4 rounded-2xl">
-                <h3 id="card2Title" class="text-xs font-bold uppercase tracking-wider text-teal-400 mb-1">4K / 2K Videó & MP3</h3>
+            <div class="ios-info-card p-4.5 rounded-xl">
+                <h3 id="card2Title" class="text-[11px] font-bold uppercase tracking-wider text-teal-400 mb-1">4K / 2K Videó & MP3</h3>
                 <p id="card2Desc" class="text-xs text-slate-400 leading-relaxed">Videók átalakítása MOV, MP4, WebM formátumba akár 4K/2K felbontásban. Hangsáv kinyerése MP3/WAV-ba.</p>
             </div>
-            <div class="ios-info-card p-4 rounded-2xl">
-                <h3 id="card3Title" class="text-xs font-bold uppercase tracking-wider text-teal-400 mb-1">HangStúdió & Bitráta</h3>
+            <div class="ios-info-card p-4.5 rounded-xl">
+                <h3 id="card3Title" class="text-[11px] font-bold uppercase tracking-wider text-teal-400 mb-1">HangStúdió & Bitráta</h3>
                 <p id="card3Desc" class="text-xs text-slate-400 leading-relaxed">MP3 és WAV konvertálás az eredeti paraméterek kijelzésével, szabadon választható bitrátával (64-320 kbps).</p>
             </div>
-            <div class="ios-info-card p-4 rounded-2xl">
-                <h3 id="card4Title" class="text-xs font-bold uppercase tracking-wider text-teal-400 mb-1">Iroda, 3D & Adat</h3>
+            <div class="ios-info-card p-4.5 rounded-xl">
+                <h3 id="card4Title" class="text-[11px] font-bold uppercase tracking-wider text-teal-400 mb-1">Iroda, 3D & Adat</h3>
                 <p id="card4Desc" class="text-xs text-slate-400 leading-relaxed">PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D modellek (.stl -> .obj) és ZIP/CBZ archívumok feldolgozása.</p>
             </div>
         </div>
 
     </main>
 
-    <!-- Lábléc: Adatvédelem és Copyright sor egymás mellett/alatt elegánsan -->
-    <footer class="p-4 sm:p-5 text-center text-xs text-slate-400 border-t border-white/10 bg-[#09090b]/35 backdrop-blur-xl mt-4 sm:mt-6 shrink-0 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3">
+    <!-- Lábléc -->
+    <footer class="p-4.5 sm:p-5 text-center text-[10px] sm:text-xs text-slate-400 border-t border-white/10 bg-[#09090b]/35 backdrop-blur-xl mt-6 shrink-0 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3">
         <span id="footerText">Adatvédelem: Minden fájlfeldolgozás közvetlenül a böngésződben történik, semmilyen adat nem kerül fel külső szerverre.</span>
         <span class="hidden sm:inline text-slate-600">•</span>
         <span id="footerCopy" class="text-slate-500">© 2026 Nagy Márton. Minden jog fenntartva.</span>
@@ -419,7 +413,6 @@
 
     <!-- Alkalmazás Logika -->
     <script>
-        // --- 1. NYELVI SZÓTÁR ---
         const i18n = {
             hu: {
                 pageTitle: "Univerzális Fájlkonvertáló",
@@ -437,7 +430,6 @@
                 origTag: "Eredeti",
                 origKeep: "Eredeti megtartása",
                 
-                // Kép panel
                 imgPanelTitle: "Képminőség és Felbontás Beállítások",
                 qualityLabel: "Képminőség és tömörítés",
                 lblImgScale: "Gyors átméretezés",
@@ -449,14 +441,12 @@
                 optFilterSepia: "Szépia (Nosztalgia)",
                 lblKeepAspect: "Oldalarány megtartása (ne torzuljon a kép)",
 
-                // Videó panel
                 vidPanelTitle: "Videó és Hangsáv Beállítások",
                 lblVidRes: "Videó Felbontás",
                 lblVidBitrate: "Videó Bitráta (Minőség)",
                 lblVidFps: "Képkockasebesség (FPS)",
                 lblVidAudioBitrate: "MP3 / Hang Bitráta",
 
-                // Hang panel
                 audPanelTitle: "Hangminőség és Bitráta Beállítások",
                 lblAudBitrate: "MP3 Bitráta",
                 lblAudSampleRate: "Mintavételezés (Sample Rate)",
@@ -484,7 +474,6 @@
                 card4Title: "Iroda, 3D & Adat",
                 card4Desc: "PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D modellek (.stl -> .obj) és ZIP/CBZ archívumok feldolgozása.",
                 
-                // Kategóriák
                 catImage: "Képfájl",
                 catPsd: "Adobe Photoshop (.psd)",
                 catTiff: "TIFF Képfájl",
@@ -500,7 +489,6 @@
                 catText: "Szöveg / Forráskód",
                 catOther: "Egyéb Fájl",
 
-                // Konverziós opciók
                 optPng: "PNG Kép (.png)",
                 optJpg: "JPG Kép (.jpg)",
                 optWebp: "WebP Kép (.webp)",
@@ -556,7 +544,6 @@
                 origTag: "Original",
                 origKeep: "Keep Original",
 
-                // Image panel
                 imgPanelTitle: "Image Quality & Resolution Settings",
                 qualityLabel: "Image quality and compression",
                 lblImgScale: "Quick Scale",
@@ -568,14 +555,12 @@
                 optFilterSepia: "Sepia Tone",
                 lblKeepAspect: "Lock aspect ratio (prevent distortion)",
 
-                // Video panel
                 vidPanelTitle: "Video & Audio Track Settings",
                 lblVidRes: "Video Resolution",
                 lblVidBitrate: "Video Bitrate (Quality)",
                 lblVidFps: "Frame Rate (FPS)",
                 lblVidAudioBitrate: "MP3 / Audio Bitrate",
 
-                // Audio panel
                 audPanelTitle: "Audio Quality & Bitrate Settings",
                 lblAudBitrate: "MP3 Bitrate",
                 lblAudSampleRate: "Sample Rate (Hz)",
@@ -603,7 +588,6 @@
                 card4Title: "Office, 3D & Data",
                 card4Desc: "Process PDF, Word, PPTX, Excel, CSV, JSON, YAML, 3D models (.stl -> .obj) and ZIP/CBZ archives.",
 
-                // Categories
                 catImage: "Image File",
                 catPsd: "Adobe Photoshop (.psd)",
                 catTiff: "TIFF Image",
@@ -619,7 +603,6 @@
                 catText: "Text / Source Code",
                 catOther: "Other File",
 
-                // Options
                 optPng: "PNG Image (.png)",
                 optJpg: "JPG Image (.jpg)",
                 optWebp: "WebP Image (.webp)",
@@ -671,10 +654,8 @@
         let videoMeta = { width: 0, height: 0, duration: 0, bitrateBps: 0, fps: 30, audioKbps: 192 };
         let audioMeta = { sampleRate: 0, channels: 0, duration: 0, bitrateKbps: 0 };
 
-        // --- DOM Elemek ---
         const langHuBtn = document.getElementById('langHu');
         const langEnBtn = document.getElementById('langEn');
-        const themeToggle = document.getElementById('themeToggle');
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const panel = document.getElementById('panel');
@@ -713,12 +694,6 @@
         const downloadArea = document.getElementById('downloadArea');
         const downloadLink = document.getElementById('downloadLink');
 
-        // --- 2. TÉMA VÁLTÁS ---
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
-
-        // --- 3. NYELVVÁLTÁS ---
         function setLanguage(lang) {
             currentLang = lang;
             const t = i18n[lang];
@@ -744,11 +719,11 @@
             });
 
             if (lang === 'hu') {
-                langHuBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm";
-                langEnBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200";
+                langHuBtn.className = "px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm";
+                langEnBtn.className = "px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200";
             } else {
-                langEnBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm";
-                langHuBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200";
+                langEnBtn.className = "px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-teal-500/20 border border-teal-500/30 text-teal-400 shadow-sm";
+                langHuBtn.className = "px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200";
             }
 
             if (selectedFile) {
@@ -759,7 +734,6 @@
         langHuBtn.addEventListener('click', () => setLanguage('hu'));
         langEnBtn.addEventListener('click', () => setLanguage('en'));
 
-        // --- 4. KÉPMÉRETEZŐ INTERAKCIÓK ---
         qualityRange.addEventListener('input', (e) => {
             qualityValue.textContent = e.target.value + '%';
         });
@@ -786,7 +760,6 @@
             }
         });
 
-        // --- 5. FÁJLKEZELÉS ÉS EREDETI ÉRTÉKEK KIOLVASÁSA ---
         dropZone.addEventListener('click', () => fileInput.click());
 
         resetBtn.addEventListener('click', () => {
@@ -1202,7 +1175,6 @@
             });
         }
 
-        // --- 6. KONVERTÁLÁSI LOGIKA ---
         function showStatus(msg, isError = false) {
             statusBox.classList.remove('hidden');
             statusBox.textContent = msg;
@@ -1617,7 +1589,6 @@
             }
         });
 
-        // --- SEGÉDFÜGGVÉNYEK ---
         function readFileAsDataURL(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
